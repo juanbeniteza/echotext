@@ -1,18 +1,13 @@
 'use client';
 
-import { use } from 'react';
-import SharedView from '../../../components/SharedView';
-import { ThemeProvider } from '../../../hooks/useTheme';
+import { useParams } from 'next/navigation';
+import SharedContent from './shared-content';
 
-// This is a Client Component that handles the dynamic route with theme support
-export default function SharedPage({ params }: { params: { encodedConfig: string } }) {
-  // Use the React.use pattern for handling params in Client Components
-  // This properly handles the params promise unwrapping
-  const resolvedParams = use(Promise.resolve(params));
+// Using useParams hook to get route parameters in a client component
+export default function SharedPage() {
+  // Use Next.js useParams hook to get the route parameters
+  const params = useParams();
+  const encodedConfig = params.encodedConfig as string;
   
-  return (
-    <ThemeProvider>
-      <SharedView encodedConfig={resolvedParams.encodedConfig} />
-    </ThemeProvider>
-  );
+  return <SharedContent encodedConfig={encodedConfig} />;
 } 

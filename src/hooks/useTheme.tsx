@@ -13,33 +13,54 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light');
+  const [mounted, setMounted] = useState(false);
   
+  // Initialize theme only once after component mounts
   useEffect(() => {
-    // Check for saved theme in localStorage
-    const savedTheme = localStorage.getItem('theme') as Theme;
+    // Safely check localStorage with try/catch for private browsing mode
+    let savedTheme: Theme | null = null;
+    try {
+      savedTheme = localStorage.getItem('theme') as Theme;
+    } catch (error) {
+      console.error('Error accessing localStorage:', error);
+    }
     
     // Check for system preference if no saved theme
     if (!savedTheme) {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(prefersDark ? 'dark' : 'light');
-      return;
+      // Check if window is defined (client-side)
+      if (typeof window !== 'undefined') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(prefersDark ? 'dark' : 'light');
+      }
+    } else {
+      setTheme(savedTheme);
     }
     
-    setTheme(savedTheme);
+    setMounted(true);
   }, []);
   
+  // Apply theme changes
   useEffect(() => {
-    // Update data-theme attribute when theme changes
-    if (theme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-      document.documentElement.classList.remove('dark');
-    }
+    if (!mounted) return;
     
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+    try {
+      // Apply theme to document element and body
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark-mode');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark-mode');
+      }
+      
+      // Safely store theme preference
+      localStorage.setItem('theme', theme);
+    } catch (error) {
+      console.error('Error applying theme:', error);
+    }
+  }, [theme, mounted]);
   
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');

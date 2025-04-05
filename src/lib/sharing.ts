@@ -73,8 +73,15 @@ export function decodeConfig(encodedString: string): ShareConfig | null {
       }
 
       try {
-        // Decompress using pako
-        const decompressed = pako.inflate(bytes, { to: 'string' });
+        // Use a try-catch specifically for pako decompression
+        let decompressed: string;
+        try {
+          // Decompress using pako
+          decompressed = pako.inflate(bytes, { to: 'string' });
+        } catch (decompressionError) {
+           // console.error("Pako decompression error:", decompressionError);
+          return null;
+        }
         
         // Check if decompressed data is valid before parsing
         if (!decompressed || typeof decompressed !== 'string' || 
