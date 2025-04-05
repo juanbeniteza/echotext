@@ -76,9 +76,22 @@ export function decodeConfig(encodedString: string): ShareConfig | null {
         // Decompress using pako
         const decompressed = pako.inflate(bytes, { to: 'string' });
         
+        // Check if decompressed data is valid before parsing
+        if (!decompressed || typeof decompressed !== 'string' || 
+            decompressed === 'undefined' || decompressed.trim() === '') {
+          console.error("Invalid decompressed data:", decompressed);
+          return null;
+        }
+
         try {
           // Parse the JSON string
           const config = JSON.parse(decompressed);
+
+          // Validate that config is an object
+          if (!config || typeof config !== 'object') {
+            console.error("Parsed config is not an object:", config);
+            return null;
+          }
 
           // Provide default values for the validation to be more resilient
           const defaultConfig: ShareConfig = {
@@ -121,37 +134,23 @@ export function decodeConfig(encodedString: string): ShareConfig | null {
             };
           } else {
             console.error("Decoded config validation failed:", config);
-            // Still return the fallback config instead of null for resilience
-            return defaultConfig;
+            return null;
           }
         } catch (jsonError) {
           console.error("JSON parse error", jsonError);
-          throw jsonError;
+          return null; // Return null instead of throwing to prevent uncaught exceptions
         }
       } catch (pakoError) {
         console.error("Decompression error", pakoError);
-        throw pakoError;
+        return null; // Return null instead of throwing to prevent uncaught exceptions
       }
     } catch (base64Error) {
       console.error("Base64 decoding error", base64Error);
-      throw base64Error;
+      return null; // Return null instead of throwing to prevent uncaught exceptions
     }
   } catch (error) {
     // Catch all errors
     console.error("Failed to decode config:", error);
-    
-    // Return a generic fallback config instead of null for resilience in case of errors
-    return {
-      text: "Decoding Error",
-      effect: null,
-      color: "#ff0000", // Red for error
-      isBold: true,
-      isItalic: false,
-      isStrikethrough: false,
-      fontSize: 36,
-      fontFamily: 'Arial, sans-serif',
-      spacing: 1,
-      repeat: 1
-    };
+    return null;
   }
 } 

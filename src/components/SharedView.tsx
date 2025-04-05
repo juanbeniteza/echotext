@@ -15,27 +15,46 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (encodedConfig) {
-      try {
-        const decoded = decodeConfig(encodedConfig);
-        if (decoded) {
-          setConfig(decoded);
-          setError(null);
-        } else {
-          setError('Invalid or corrupted share link.');
-          setConfig(null);
-        }
-      } catch (err) {
-        console.error("Failed to decode content:", err);
-        setError('Failed to decode shared content.');
+    // Function to safely decode config
+    const safelyDecodeConfig = () => {
+      if (!encodedConfig) {
+        setError('Invalid URL. The share link parameter is missing.');
         setConfig(null);
+        setIsLoading(false);
+        return;
       }
-    } else {
-       setError('Share link parameter missing or invalid.');
-       setConfig(null);
-    }
-    setIsLoading(false);
-  }, [encodedConfig]); 
+
+      try {
+        // Wrap in a setTimeout to ensure any exceptions don't crash the entire app
+        setTimeout(() => {
+          try {
+            const decoded = decodeConfig(encodedConfig);
+            if (decoded && decoded.text && decoded.text.trim() !== '') {
+              setConfig(decoded);
+              setError(null);
+            } else {
+              setError('Invalid URL. This EchoText link might be corrupted or malformed.');
+              setConfig(null);
+            }
+          } catch (err) {
+            console.error("Failed to decode content:", err);
+            setError('Invalid URL. This EchoText link cannot be decoded properly.');
+            setConfig(null);
+          } finally {
+            setIsLoading(false);
+          }
+        }, 0);
+      } catch (err) {
+        // Fallback error handler for any unexpected errors
+        console.error("Unexpected error in decoding process:", err);
+        setError('An unexpected error occurred while processing this link.');
+        setConfig(null);
+        setIsLoading(false);
+      }
+    };
+
+    safelyDecodeConfig();
+  }, [encodedConfig]);
 
   if (isLoading) {
     return (
@@ -45,36 +64,39 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
     );
   }
 
-  if (error) {
+  if (error || !config || !config.text || config.text.trim() === '') {
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-red-50 p-4">
-        <p className="text-xl text-red-700 font-semibold mb-4">Error</p>
-        <p className="text-red-600 text-center mb-6">{error}</p>
-        <Link href="/" className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-150 ease-in-out">
-          Go back to editor
-        </Link>
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 p-8">
+        <div className="max-w-md text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">Invalid Link</h2>
+          <p className="text-gray-600 mb-8">{error || "The URL you're trying to access is not valid."}</p>
+          <Link 
+            href="/" 
+            className="px-6 py-3 bg-indigo-600 text-white text-center rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 ease-in-out font-medium"
+          >
+            Go to EchoText Home
+          </Link>
+        </div>
       </div>
     );
   }
 
-  if (config) {
-    return (
-      <main className="relative min-h-screen bg-dotted">
-        <div className="absolute inset-0 z-[5]">
-          <TextDisplay config={config} fullscreen={true} />
-        </div>
-        <div className="absolute top-4 left-4 z-[30]">
-            <Link href="/" className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition duration-150 ease-in-out text-sm font-medium">
-              Create your own EchoText
-            </Link>
-        </div>
-      </main>
-    );
-  }
-
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <p className="text-lg text-gray-600">Could not load shared content.</p>
-    </div>
+    <main className="relative min-h-screen bg-dotted">
+      <div className="absolute inset-0 z-[5]">
+        <TextDisplay config={config} fullscreen={true} />
+      </div>
+      
+      {/* Action buttons container */}
+      <div className="absolute top-4 left-4 z-[30]">
+        {/* Create your own button */}
+        <Link 
+          href="/" 
+          className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition duration-150 ease-in-out text-sm font-medium"
+        >
+          Create your own EchoText
+        </Link>
+      </div>
+    </main>
   );
 } 

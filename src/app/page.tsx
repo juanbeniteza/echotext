@@ -6,7 +6,7 @@ import TextDisplay from '../components/TextDisplay';
 import { Effect } from '../types';
 import { encodeConfig, ShareConfig } from '../lib/sharing';
 import { availableEffects, getEffectName, getEffectClass } from '../utils/effects';
-import { FiEye, FiX, FiShare2, FiCheck } from "react-icons/fi";
+import { FiEye, FiX, FiShare2, FiCheck, FiCopy } from "react-icons/fi";
 import { copyToClipboard } from '../utils/clipboard';
 
 // Formatting Button Component
@@ -42,6 +42,7 @@ export default function Home() {
   
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const handleEffectClick = (effect: Effect) => {
     setEffect(effect);
@@ -57,6 +58,9 @@ export default function Home() {
   };
 
   const handleShare = async () => {
+    // Don't proceed if there's no text
+    if (!config.text.trim()) return;
+
     const shareableConfig: ShareConfig = {
         text: config.text,
         effect: config.effect,
@@ -76,14 +80,25 @@ export default function Home() {
       return;
     }
 
-    const shareUrl = `${window.location.origin}/s/${encoded}`;
+    const generatedShareUrl = `${window.location.origin}/s/${encoded}`;
+    setShareUrl(generatedShareUrl);
 
-    const success = await copyToClipboard(shareUrl);
+    const success = await copyToClipboard(generatedShareUrl);
     if (success) {
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
     } else {
         alert("Failed to copy link to clipboard.");
+    }
+  };
+
+  const handleCopyLink = async () => {
+    if (!shareUrl) return;
+    
+    const success = await copyToClipboard(shareUrl);
+    if (success) {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
     }
   };
 
@@ -183,28 +198,68 @@ export default function Home() {
             className={`flex items-center justify-center gap-2 px-6 py-3 border rounded-lg font-medium transition duration-150 ease-in-out shadow-sm 
                        ${isCopied 
                          ? 'bg-green-100 border-green-300 text-green-700' 
-                         : 'bg-indigo-50 border-indigo-200 text-indigo-600 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                         : 'bg-indigo-50 border-indigo-200 text-indigo-600 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}
+                       ${!config.text.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={handleShare}
-            disabled={isCopied}
+            disabled={isCopied || !config.text.trim()}
             aria-label="Share EchoText configuration"
           >
             {isCopied ? <FiCheck className="h-5 w-5" /> : <FiShare2 className="h-5 w-5" />}
             <span>{isCopied ? "Copied!" : "Share"}</span>
           </button>
         </div>
+
+        {/* Share URL display section */}
+        {shareUrl && (
+          <div className="w-full mt-4 border border-gray-200 rounded-lg p-4 bg-white bg-opacity-90 shadow-sm">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-gray-700 font-medium">Share Link:</p>
+              <button
+                onClick={handleCopyLink}
+                className="text-indigo-600 hover:text-indigo-800 transition-colors p-1"
+                aria-label="Copy share URL"
+              >
+                <FiCopy className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-2 bg-gray-50 p-3 rounded-md overflow-x-auto">
+              <code className="text-xs sm:text-sm break-all text-gray-800">{shareUrl}</code>
+            </div>
+          </div>
+        )}
       </div> 
 
       {/* Fullscreen Preview */}
       {isFullscreen && (
         <div className="fixed inset-0 z-50 bg-dotted flex items-center justify-center p-4 overflow-auto">
           <TextDisplay config={config} fullscreen={true} />
-          <button 
-            className="fixed top-4 right-4 z-[51] px-4 py-2 bg-white rounded-lg shadow-md text-gray-700 font-medium hover:bg-gray-100 transition duration-150 ease-in-out"
-            onClick={toggleFullscreen}
-            aria-label="Exit fullscreen preview"
-          >
-            Close Preview
-          </button>
+          
+          {/* Button controls container - add flex for positioning multiple buttons */}
+          <div className="fixed top-4 right-4 z-[51] flex gap-2">
+            {/* Copy Link Button */}
+            <button 
+              className={`flex items-center justify-center gap-2 px-4 py-2 border rounded-lg transition duration-150 ease-in-out shadow-md 
+                        ${isCopied 
+                          ? 'bg-green-100 border-green-300 text-green-700' 
+                          : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}
+                        ${!config.text.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={handleShare}
+              disabled={isCopied || !config.text.trim()}
+              aria-label="Copy share link"
+            >
+              {isCopied ? <FiCheck className="h-5 w-5" /> : <FiShare2 className="h-5 w-5" />}
+              <span>{isCopied ? "Copied!" : "Copy Link"}</span>
+            </button>
+            
+            {/* Close Preview Button */}
+            <button 
+              className="px-4 py-2 bg-white rounded-lg shadow-md text-gray-700 font-medium hover:bg-gray-100 transition duration-150 ease-in-out border border-gray-300"
+              onClick={toggleFullscreen}
+              aria-label="Exit fullscreen preview"
+            >
+              Close Preview
+            </button>
+          </div>
         </div>
       )}
     </main>
