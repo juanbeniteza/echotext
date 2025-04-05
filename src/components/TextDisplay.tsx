@@ -64,41 +64,6 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
     }
   }, []); // Only run once on mount
 
-  // Predefined position classes for 20 elements
-  const positions = [
-    // Center
-    "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
-    
-    // Top row
-    "absolute top-[15%] left-[15%] -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[15%] left-[35%] -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[15%] left-1/2 -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[15%] left-[65%] -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[15%] left-[85%] -translate-x-1/2 -translate-y-1/2",
-    
-    // Second row
-    "absolute top-[35%] left-[20%] -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[35%] left-[40%] -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[35%] left-[60%] -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[35%] left-[80%] -translate-x-1/2 -translate-y-1/2",
-    
-    // Third row
-    "absolute top-[65%] left-[25%] -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[65%] left-[50%] -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[65%] left-[75%] -translate-x-1/2 -translate-y-1/2",
-    
-    // Bottom row
-    "absolute top-[85%] left-[15%] -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[85%] left-[35%] -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[85%] left-1/2 -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[85%] left-[65%] -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[85%] left-[85%] -translate-x-1/2 -translate-y-1/2",
-    
-    // Extra positions for corners
-    "absolute top-[25%] left-[25%] -translate-x-1/2 -translate-y-1/2",
-    "absolute top-[75%] left-[75%] -translate-x-1/2 -translate-y-1/2"
-  ];
-
   // Generate 20 text elements
   const textElements = Array.from({ length: 20 }, (_, index) => {
     const effectClass = getEffectClass(effect);
@@ -119,9 +84,6 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
       isItalic ? 'italic' : '',
       isStrikethrough ? 'line-through' : '',
     ].filter(Boolean).join(' ');
-
-    // Position based on predefined array
-    const position = positions[index % positions.length];
     
     // Create more dramatic size variation between instances
     // Define specific indices that will have larger sizes for visual focus
@@ -145,30 +107,83 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
       fontSize: `${parseInt(baseTextStyle.fontSize as string) * sizeMultiplier}px`
     };
     
-    // Create unique animation properties for each position
-    const floatingAnimation = {
-      // Create a more complex multi-point path instead of just start-to-end
-      y: [0, ((index % 3) - 1) * 12, ((index % 2) - 0.5) * 15, ((index % 3) - 1) * 10, 0],  
-      x: [0, ((index % 4) - 1.5) * 10, ((index % 5) - 2) * 12, ((index % 3) - 1) * 8, 0]
+    // Animation timing values
+    const duration = 15 + (index % 10); // 15-24 seconds for full cycle
+    const delay = index * 0.7; // Larger staggered delay
+    
+    // Movement patterns - much larger screen-wide movements
+    // Instead of fixed positions with small animations, use center positioning 
+    // with large animations covering the full screen
+    
+    // Define animation paths that cover large areas of the screen
+    // Create random-like but distinct paths for each element
+    // Using modulo operations to create variety based on index
+    
+    // Create custom path patterns based on element index
+    let animationPath;
+    
+    // Distribute starting positions across the screen based on index
+    const getStartPosition = (idx: number) => {
+      // Create a grid of initial positions throughout the screen
+      const row = Math.floor(idx / 5); // 0-3 for rows
+      const col = idx % 5; // 0-4 for columns
+      
+      // Calculate percentages for initial positions
+      const startLeft = 15 + (col * 17.5); // 15%, 32.5%, 50%, 67.5%, 85%
+      const startTop = 15 + (row * 23.3); // 15%, 38.3%, 61.6%, 84.9%
+      
+      return { startLeft, startTop };
     };
     
-    // Different durations for each instance - increase overall duration to make movement smoother
-    const duration = 6 + (index % 7);
+    // Get starting position for this instance
+    const { startLeft, startTop } = getStartPosition(index);
     
-    // Slightly offset each animation
-    const delay = index * 0.3;
+    // Switch between different motion patterns for variety
+    switch (index % 5) {
+      case 0: // Diagonal across screen
+        animationPath = {
+          left: [`${startLeft}%`, '85%', '15%', `${startLeft}%`],
+          top: [`${startTop}%`, '85%', '15%', `${startTop}%`],
+        };
+        break;
+      case 1: // Horizontal sweep
+        animationPath = {
+          left: [`${startLeft}%`, '90%', '10%', `${startLeft}%`],
+          top: [`${startTop}%`, `${startTop}%`, `${startTop}%`, `${startTop}%`],
+        };
+        break;
+      case 2: // Vertical sweep
+        animationPath = {
+          left: [`${startLeft}%`, `${startLeft}%`, `${startLeft}%`, `${startLeft}%`],
+          top: [`${startTop}%`, '90%', '10%', `${startTop}%`],
+        };
+        break;
+      case 3: // Circular/oval path
+        animationPath = {
+          left: [`${startLeft}%`, '85%', '50%', '15%', `${startLeft}%`],
+          top: [`${startTop}%`, '50%', '85%', '50%', `${startTop}%`],
+        };
+        break;
+      case 4: // Figure-8 pattern
+        animationPath = {
+          left: [`${startLeft}%`, '75%', '75%', '25%', `${startLeft}%`],
+          top: [`${startTop}%`, '75%', '25%', '75%', `${startTop}%`],
+        };
+        break;
+    }
 
     return (
       <motion.div 
         key={index}
-        className={position}
-        animate={floatingAnimation}
+        className="absolute -translate-x-1/2 -translate-y-1/2"
+        animate={animationPath}
         transition={{
           repeat: Infinity,
-          repeatType: "reverse",
+          repeatType: "loop",
           duration: duration,
           delay: delay,
-          ease: "easeInOut"
+          ease: "easeInOut",
+          times: [0, 0.5, 1], // Control timing of the motion path
         }}
       >
         <div
