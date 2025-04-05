@@ -14,6 +14,9 @@ module.exports = {
       textColor: {
         dark: 'var(--foreground)',
       },
+      fontFamily: {
+        custom: ['var(--font-custom)', 'Arial', 'sans-serif'],
+      },
     },
   },
   plugins: [],

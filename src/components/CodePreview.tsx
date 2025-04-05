@@ -18,31 +18,25 @@ const CodePreview: React.FC<CodePreviewProps> = ({ config, readOnly }) => {
     <div
       className="p-4 rounded-lg shadow-lg bg-white" // Basic container
       style={{
-        padding: `${config.padding}px`,
-        // Add other styles based on config later
+        padding: '16px',
       }}
     >
       <pre
         style={{
           fontSize: `${config.fontSize}px`,
-          fontFamily: config.fontFamily,
+          fontFamily: config.fontFamily || 'var(--font-custom), monospace',
           // Apply theme background/text color later
         }}
       >
         <code>
-          {/* Display line numbers if enabled */}
-          {config.showLineNumbers && (
-            <span className="line-numbers"> {/* Style this separately */}
-              {config.code.split('\n').map((_: string, i: number) => `${i + 1}\n`).join('')}
-            </span>
-          )}
-          {config.code}
+          {/* Display the text content */}
+          {config.text}
         </code>
       </pre>
       {/* Maybe add info about the settings used? */}
       {readOnly && (
-         <p className="text-xs text-gray-500 mt-2">
-             Shared content (Read-only). Language: {config.language}, Theme: {config.theme}
+         <p className="text-xs text-gray-500 mt-2 font-custom">
+             Shared content (Read-only)
          </p>
       )}
     </div>

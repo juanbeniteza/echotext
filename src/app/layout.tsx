@@ -1,10 +1,27 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
+import { Analytics } from '@vercel/analytics/react';
 import "./globals.css";
 import "../styles/effects.css"; // Import our custom effects CSS
 import { ThemeProvider } from "../hooks/useTheme";
+import { track } from '@vercel/analytics';
 
-const inter = Inter({ subsets: ["latin"] });
+// Define the custom font
+const customFont = localFont({
+  src: [
+    {
+      path: '../../public/fonts/StyreneB-Regular.otf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/StyreneB-Bold.otf',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-custom',
+});
 
 export const metadata: Metadata = {
   title: "~ echotext ~",
@@ -19,8 +36,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       {/* Ensure minimum height */}
-      <body className={`${inter.className} min-h-screen`}>
+      <body className={`${customFont.className} min-h-screen`}>
         <ThemeProvider>{children}</ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );

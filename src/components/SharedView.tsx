@@ -5,6 +5,7 @@ import { decodeConfig, ShareConfig } from '../lib/sharing';
 import TextDisplay from './TextDisplay'; 
 import ThemeToggle from './ThemeToggle';
 import Link from 'next/link';
+import { track } from '@vercel/analytics';
 
 interface SharedViewProps {
   encodedConfig: string | null;
@@ -34,25 +35,49 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
             if (decoded && decoded.text && decoded.text.trim() !== '') {
               setConfig(decoded);
               setError(null);
+              
+              // Track when a shared link is successfully viewed
+              track('link_viewed', {
+                text_length: decoded.text.length,
+                has_effect: decoded.effect !== null,
+                effect_type: decoded.effect,
+                has_formatting: decoded.isBold || decoded.isItalic || decoded.isStrikethrough
+              });
             } else {
               setError('Invalid URL. This EchoText link might be corrupted or malformed.');
               setConfig(null);
+              
+              // Track failed link views
+              track('link_error', {
+                error_type: 'malformed_data',
+                encoded_id: encodedConfig
+              });
             }
           } catch (err) {
             console.error("Failed to decode content:", err);
             
             // More specific error messages based on error type
+            let errorType = 'unknown_error';
             if (err instanceof Error) {
               if (err.message.includes('atob') || err.message.includes('decode')) {
                 setError('This link contains invalid characters that cannot be decoded properly.');
+                errorType = 'decode_error';
               } else if (err.message.includes('JSON')) {
                 setError('This link contains data that cannot be properly processed.');
+                errorType = 'json_error';
               } else {
                 setError(`Invalid URL: ${err.message}`);
+                errorType = 'url_error';
               }
             } else {
               setError('Invalid URL. This EchoText link cannot be decoded properly.');
             }
+            
+            // Track error during decoding
+            track('link_error', {
+              error_type: errorType,
+              encoded_id: encodedConfig
+            });
             
             setConfig(null);
           } finally {
@@ -71,6 +96,12 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
         setError(errorMessage);
         setConfig(null);
         setIsLoading(false);
+        
+        // Track unexpected errors
+        track('link_error', {
+          error_type: 'unexpected_error',
+          encoded_id: encodedConfig
+        });
       }
     };
 

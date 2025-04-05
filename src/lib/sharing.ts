@@ -241,7 +241,7 @@ export function decodeConfig(encodedString: string): ShareConfig | null {
             isItalic: typeof config.isItalic === 'boolean' ? config.isItalic : false,
             isStrikethrough: typeof config.isStrikethrough === 'boolean' ? config.isStrikethrough : false,
             fontSize: typeof config.fontSize === 'number' && config.fontSize > 0 ? config.fontSize : 36,
-            fontFamily: config.fontFamily || 'Arial, sans-serif',
+            fontFamily: config.fontFamily || 'var(--font-custom), Arial, sans-serif',
             spacing: typeof config.spacing === 'number' ? config.spacing : 1,
             repeat: typeof config.repeat === 'number' && config.repeat >= 1 ? config.repeat : 1
           };

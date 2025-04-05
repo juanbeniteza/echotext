@@ -9,6 +9,7 @@ import { encodeConfig, ShareConfig } from '../lib/sharing';
 import { availableEffects, getEffectName, getEffectClass } from '../utils/effects';
 import { FiEye, FiX, FiShare2, FiCheck, FiCopy } from "react-icons/fi";
 import { copyToClipboard } from '../utils/clipboard';
+import { track } from '@vercel/analytics';
 
 // Formatting Button Component
 interface FormatButtonProps {
@@ -97,6 +98,14 @@ export default function Home() {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const generatedShareUrl = `${origin}/s/${encoded}`;
     setShareUrl(generatedShareUrl);
+
+    // Track link creation event with analytics
+    track('link_created', {
+      text_length: config.text.length,
+      has_effect: config.effect !== Effect.NONE,
+      effect_type: config.effect,
+      has_formatting: config.isBold || config.isItalic || config.isStrikethrough
+    });
 
     const success = await copyToClipboard(generatedShareUrl);
     if (success) {
