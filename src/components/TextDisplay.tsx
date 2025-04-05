@@ -138,36 +138,56 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
     // Get starting position for this instance
     const { startLeft, startTop } = getStartPosition(index);
     
+    // Calculate scaling values (based on index to create variety)
+    // Base scale for each size category
+    let baseScale = 1.0;
+    if (largeIndices.includes(index)) {
+      baseScale = 1.2;
+    } else if (mediumIndices.includes(index)) {
+      baseScale = 0.9;
+    } else {
+      baseScale = 0.7;
+    }
+    
+    // Create scale animations that sync with movement paths
+    const scaleMin = baseScale * 0.7; // Minimum scale is 70% of the base
+    const scaleMax = baseScale * 1.5; // Maximum scale is 150% of the base
+    
     // Switch between different motion patterns for variety
     switch (index % 5) {
-      case 0: // Diagonal across screen
+      case 0: // Diagonal across screen with scaling
         animationPath = {
           left: [`${startLeft}%`, '85%', '15%', `${startLeft}%`],
           top: [`${startTop}%`, '85%', '15%', `${startTop}%`],
+          scale: [baseScale, scaleMax, scaleMin, baseScale]
         };
         break;
-      case 1: // Horizontal sweep
+      case 1: // Horizontal sweep with scaling
         animationPath = {
           left: [`${startLeft}%`, '90%', '10%', `${startLeft}%`],
           top: [`${startTop}%`, `${startTop}%`, `${startTop}%`, `${startTop}%`],
+          scale: [baseScale, scaleMin, scaleMax, baseScale]
         };
         break;
-      case 2: // Vertical sweep
+      case 2: // Vertical sweep with scaling
         animationPath = {
           left: [`${startLeft}%`, `${startLeft}%`, `${startLeft}%`, `${startLeft}%`],
           top: [`${startTop}%`, '90%', '10%', `${startTop}%`],
+          scale: [baseScale, scaleMax, scaleMin, baseScale]
         };
         break;
-      case 3: // Circular/oval path
+      case 3: // Circular/oval path with scaling
         animationPath = {
           left: [`${startLeft}%`, '85%', '50%', '15%', `${startLeft}%`],
           top: [`${startTop}%`, '50%', '85%', '50%', `${startTop}%`],
+          scale: [baseScale, scaleMin, scaleMax, scaleMin, baseScale]
         };
         break;
-      case 4: // Figure-8 pattern
+      case 4: // Figure-8 pattern with scaling
         animationPath = {
           left: [`${startLeft}%`, '75%', '75%', '25%', `${startLeft}%`],
           top: [`${startTop}%`, '75%', '25%', '75%', `${startTop}%`],
+          scale: [baseScale, scaleMax, scaleMin, scaleMax, baseScale]
         };
         break;
     }
