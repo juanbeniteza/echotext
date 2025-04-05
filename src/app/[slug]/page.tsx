@@ -79,7 +79,7 @@ export default function SharedTextPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-0">
+    <main className="flex min-h-screen flex-col items-center justify-between p-0 bg-dotted overflow-hidden">
       <div className="fixed top-4 left-4 z-20">
         <button
           className="px-4 py-2 bg-white rounded-md shadow-md hover:bg-gray-100 transition-colors"

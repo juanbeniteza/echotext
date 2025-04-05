@@ -38,10 +38,19 @@ export async function GET(
       );
     }
     
-    const record = data as unknown as LinkRecord;
+    // Convert data to LinkRecord - our mock implementation might
+    // have a different structure than the Supabase response
+    const record: LinkRecord = {
+      id: data.id,
+      config: data.config,
+      created_at: data.created_at instanceof Date ? data.created_at : new Date(data.created_at),
+      expires_at: data.expires_at ? (data.expires_at instanceof Date ? data.expires_at : new Date(data.expires_at)) : null,
+      view_count: data.view_count || 0,
+      user_id: data.user_id || null
+    };
     
     // Check if the link has expired
-    if (record.expires_at && new Date(record.expires_at) < new Date()) {
+    if (record.expires_at && record.expires_at < new Date()) {
       return NextResponse.json(
         { error: 'This link has expired' },
         { status: 410 }  // Gone status code

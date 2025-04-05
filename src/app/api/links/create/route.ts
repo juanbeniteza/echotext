@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
         config,
         expires_at,
         view_count: 0,
+        created_at: new Date(),
       });
     
     if (error) {

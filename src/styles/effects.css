@@ -11,7 +11,8 @@
 }
 
 .effect-shake {
-  animation: shake 1s ease-in-out infinite;
+  animation: shake 0.8s cubic-bezier(.36,.07,.19,.97) both infinite;
+  /* Using a different timing function for variety */
 }
 
 /* Ripple animation */
@@ -35,4 +36,24 @@
 
 .effect-jitter {
   animation: jitter 0.3s linear infinite;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+.effect-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Wave animation */
+@keyframes wave {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.effect-wave {
+  animation: wave 2s ease-in-out infinite;
 } 

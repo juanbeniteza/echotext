@@ -17,7 +17,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      {/* Apply white background and ensure minimum height */}
+      <body className={`${inter.className} bg-white min-h-screen`}>{children}</body>
     </html>
   );
 }

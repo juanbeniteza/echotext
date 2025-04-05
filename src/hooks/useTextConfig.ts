@@ -3,13 +3,17 @@ import { TextConfig, Effect } from '../types';
 
 // Default configuration values
 export const DEFAULT_CONFIG: TextConfig = {
-  text: 'Hello, World!',
+  text: '', // Start with empty text
   effect: Effect.NONE,
   color: '#000000',
   fontSize: 24,
   fontFamily: 'Arial, sans-serif',
   spacing: 0,
-  repeat: 25, // Default number of repetitions
+  repeat: 50, // Increased default number of repetitions
+  // Formatting defaults
+  isBold: false,
+  isItalic: false,
+  isStrikethrough: false,
 };
 
 export const useTextConfig = (initialConfig: Partial<TextConfig> = {}) => {
@@ -49,25 +53,39 @@ export const useTextConfig = (initialConfig: Partial<TextConfig> = {}) => {
     updateConfig('color', color);
   }, [updateConfig]);
 
-  // Update the font size
+  // Update the font size (Keep for potential future use)
   const setFontSize = useCallback((fontSize: number) => {
     updateConfig('fontSize', fontSize);
   }, [updateConfig]);
 
-  // Update the font family
+  // Update the font family (Keep for potential future use)
   const setFontFamily = useCallback((fontFamily: string) => {
     updateConfig('fontFamily', fontFamily);
   }, [updateConfig]);
 
-  // Update the letter spacing
+  // Update the letter spacing (Keep for potential future use)
   const setSpacing = useCallback((spacing: number) => {
     updateConfig('spacing', spacing);
   }, [updateConfig]);
 
-  // Update the repeat count
+  // Update the repeat count (Keep for potential future use)
   const setRepeat = useCallback((repeat: number) => {
     updateConfig('repeat', repeat);
   }, [updateConfig]);
+
+  // --- Text Formatting Setters ---
+  const toggleBold = useCallback(() => {
+    updateConfig('isBold', !config.isBold);
+  }, [config.isBold, updateConfig]);
+
+  const toggleItalic = useCallback(() => {
+    updateConfig('isItalic', !config.isItalic);
+  }, [config.isItalic, updateConfig]);
+
+  const toggleStrikethrough = useCallback(() => {
+    updateConfig('isStrikethrough', !config.isStrikethrough);
+  }, [config.isStrikethrough, updateConfig]);
+  // --- End Text Formatting Setters ---
 
   return {
     config,
@@ -80,5 +98,9 @@ export const useTextConfig = (initialConfig: Partial<TextConfig> = {}) => {
     setFontFamily,
     setSpacing,
     setRepeat,
+    // Formatting toggles
+    toggleBold,
+    toggleItalic,
+    toggleStrikethrough,
   };
 }; 

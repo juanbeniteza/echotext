@@ -3,6 +3,8 @@ export enum Effect {
   SHAKE = 'shake',
   RIPPLE = 'ripple',
   JITTER = 'jitter',
+  PULSE = 'pulse',
+  WAVE = 'wave',
 }
 
 export interface TextConfig {
@@ -13,6 +15,10 @@ export interface TextConfig {
   fontFamily: string;
   spacing: number;
   repeat: number; // Number of times to repeat the text
+  // Text Formatting
+  isBold: boolean;
+  isItalic: boolean;
+  isStrikethrough: boolean;
 }
 
 export interface LinkRecord {

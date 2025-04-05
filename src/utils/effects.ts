@@ -9,6 +9,10 @@ export const getEffectClass = (effect: Effect): string => {
       return 'effect-ripple';
     case Effect.JITTER:
       return 'effect-jitter';
+    case Effect.PULSE:
+      return 'effect-pulse';
+    case Effect.WAVE:
+      return 'effect-wave';
     case Effect.NONE:
     default:
       return '';
@@ -24,6 +28,10 @@ export const getEffectName = (effect: Effect): string => {
       return 'Ripple';
     case Effect.JITTER:
       return 'Jitter';
+    case Effect.PULSE:
+      return 'Pulse';
+    case Effect.WAVE:
+      return 'Wave';
     case Effect.NONE:
       return 'None';
     default:
@@ -33,10 +41,11 @@ export const getEffectName = (effect: Effect): string => {
 
 // List all available effects for selection
 export const availableEffects: Effect[] = [
-  Effect.NONE,
-  Effect.SHAKE,
-  Effect.RIPPLE,
   Effect.JITTER,
+  Effect.RIPPLE,
+  Effect.SHAKE,
+  Effect.PULSE,
+  Effect.WAVE,
 ];
 
 // Get CSS style properties based on text configuration
