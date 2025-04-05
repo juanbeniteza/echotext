@@ -4,7 +4,6 @@ import { Analytics } from '@vercel/analytics/react';
 import "./globals.css";
 import "../styles/effects.css"; // Import our custom effects CSS
 import { ThemeProvider } from "../hooks/useTheme";
-import { track } from '@vercel/analytics';
 
 // Define the custom font
 const customFont = localFont({
@@ -25,7 +24,7 @@ const customFont = localFont({
 
 export const metadata: Metadata = {
   title: "~ echotext ~",
-  description: "Create beautiful text with visual effects like shake, ripple, and jitter. Customize colors and formatting, then share with a unique link.",
+  description: "Share beautiful text with visual effects like shake, ripple, and jitter. Customize colors and formatting, then share with a unique link.",
 };
 
 export default function RootLayout({

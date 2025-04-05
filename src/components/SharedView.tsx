@@ -119,7 +119,7 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
         {/* Author attribution link in bottom-right */}
         <div className="fixed bottom-4 right-4 z-[30]">
           <a 
-            href="https://juanbenitez.dev" 
+            href={process.env.NEXT_PUBLIC_AUTHOR_URL || "https://juanbenitez.dev"}
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
@@ -146,7 +146,7 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
         {/* Author attribution link in bottom-right */}
         <div className="fixed bottom-4 right-4 z-[30]">
           <a 
-            href="https://juanbenitez.dev" 
+            href={process.env.NEXT_PUBLIC_AUTHOR_URL || "https://juanbenitez.dev"}
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
@@ -183,7 +183,7 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
       {/* Author attribution link in bottom-right */}
       <div className="fixed bottom-4 right-4 z-[30]">
         <a 
-          href="https://juanbenitez.dev" 
+          href={process.env.NEXT_PUBLIC_AUTHOR_URL || "https://juanbenitez.dev"}
           target="_blank" 
           rel="noopener noreferrer" 
           className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"

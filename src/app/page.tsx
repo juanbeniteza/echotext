@@ -137,13 +137,13 @@ export default function Home() {
       {/* Title and description - centered on desktop, single line each on mobile */}
       <div className="absolute top-16 md:top-20 left-1/2 transform -translate-x-1/2 text-center z-10 w-full px-4">
         <h1 className="text-4xl md:text-5xl font-bold whitespace-nowrap overflow-hidden text-ellipsis">~ echotext ~</h1>
-        <p className="text-md md:text-lg mt-2 whitespace-nowrap overflow-hidden text-ellipsis">create text with mesmerizing effects</p>
+        <p className="text-md md:text-lg mt-2 whitespace-nowrap overflow-hidden text-ellipsis">share text with mesmerizing effects</p>
       </div>
 
       {/* Author attribution link - fixed to bottom for all displays */}
       <div className="fixed bottom-4 right-4 z-10">
         <a 
-          href="https://juanbenitez.dev" 
+          href={process.env.NEXT_PUBLIC_AUTHOR_URL || "https://juanbenitez.dev"}
           target="_blank" 
           rel="noopener noreferrer" 
           className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
@@ -291,7 +291,7 @@ export default function Home() {
           {/* Author attribution link in bottom-right */}
           <div className="fixed bottom-4 right-4 z-[51]">
             <a 
-              href="https://juanbenitez.dev" 
+              href={process.env.NEXT_PUBLIC_AUTHOR_URL || "https://juanbenitez.dev"}
               target="_blank" 
               rel="noopener noreferrer" 
               className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
