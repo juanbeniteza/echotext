@@ -15,7 +15,9 @@ function safeBase64Encode(data: string): string {
   try {
     // Try browser's built-in btoa first
     return btoa(data);
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   } catch (e) {
+  /* eslint-enable @typescript-eslint/no-unused-vars */
     // If btoa fails or is unavailable, use a manual approach
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
     let result = '';
@@ -42,7 +44,9 @@ function safeBase64Decode(base64: string): string {
   try {
     // Try browser's built-in atob first
     return atob(base64);
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   } catch (e) {
+  /* eslint-enable @typescript-eslint/no-unused-vars */
     // If atob fails or is unavailable, use a manual approach
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
     const lookup = new Uint8Array(256);

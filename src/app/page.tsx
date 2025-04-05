@@ -5,7 +5,7 @@ import { useTextConfig } from '../hooks/useTextConfig';
 import TextDisplay from '../components/TextDisplay';
 import ThemeToggle from '../components/ThemeToggle';
 import { Effect } from '../types';
-import { encodeConfig, ShareConfig } from '../lib/sharing';
+import { ShareConfig } from '../lib/sharing';
 import { encodeConfigCompact } from '../lib/optimizedSharing';
 import { availableEffects, getEffectName, getEffectClass } from '../utils/effects';
 import { FiEye, FiX, FiShare2, FiCheck, FiCopy } from "react-icons/fi";
