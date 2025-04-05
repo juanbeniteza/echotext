@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { TextConfig } from '../types';
 import { getEffectClass, getTextStyle } from '../utils/effects';
 
@@ -124,19 +124,40 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
       default:
         position = "";
     }
+    
+    // Create unique animation properties for each position
+    // Using different ranges for x/y and different durations for more natural motion
+    const floatingAnimation = {
+      y: [0, index % 3 === 0 ? -10 : (index % 3 === 1 ? 8 : -6)],
+      x: [0, index % 3 === 0 ? 5 : (index % 3 === 1 ? -8 : 6)]
+    };
+    
+    // Different durations for each instance based on position
+    const duration = 4 + (index * 0.5);
+    
+    // Slightly offset each animation
+    const delay = index * 0.2;
 
     return (
-      <div 
+      <motion.div 
         key={index}
         className={position}
+        animate={floatingAnimation}
+        transition={{
+          repeat: Infinity,
+          repeatType: "reverse",
+          duration: duration,
+          delay: delay,
+          ease: "easeInOut"
+        }}
       >
-        <span
+        <div
           className={`effect-text ${effectClass} ${formattingClasses} max-w-[80vw] overflow-hidden text-ellipsis text-center`}
           style={baseTextStyle}
         >
           {text}
-        </span>
-      </div>
+        </div>
+      </motion.div>
     );
   });
 
