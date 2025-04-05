@@ -30,9 +30,17 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
   
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Update container size for animation bounds
+  // Update container size and detect mobile screens
   useEffect(() => {
+    // Initial check for mobile screen
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // Standard mobile breakpoint
+    };
+    
+    checkMobile(); // Check on mount
+    
     if (containerRef.current) {
       const { offsetWidth, offsetHeight } = containerRef.current;
       setContainerSize({ width: offsetWidth, height: offsetHeight });
@@ -41,78 +49,94 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
         for (let entry of entries) {
           setContainerSize({ width: entry.contentRect.width, height: entry.contentRect.height });
         }
+        checkMobile(); // Also check mobile on resize
       });
+      
       resizeObserver.observe(containerRef.current);
-      return () => resizeObserver.disconnect();
+      
+      // Add window resize listener as a backup
+      window.addEventListener('resize', checkMobile);
+      
+      return () => {
+        resizeObserver.disconnect();
+        window.removeEventListener('resize', checkMobile);
+      };
     }
   }, []); // Only run once on mount
 
-  // Generate animated text elements
-  const textElements = Array.from({ length: repeat }, (_, index) => {
+  // Generate 9 equally distributed text elements
+  const textElements = Array.from({ length: 9 }, (_, index) => {
     const effectClass = getEffectClass(effect);
-    const baseTextStyle = getTextStyle(color, fontSize, fontFamily, spacing);
     
-    // Random percentage position (0% to 100%)
-    const getRandomPercent = () => Math.random() * 100;
-    const duration = 5 + Math.random() * 10; // Random duration between 5 and 15 seconds
+    // Adjust font size for mobile
+    let sizePx = typeof fontSize === 'string' ? parseInt(fontSize) : fontSize;
     
-    // --- Perspective Scaling Logic ---
-    const calculateScale = (topPercent: number, leftPercent: number): number => {
-      const maxDistance = Math.sqrt(50**2 + 50**2); // Max distance from center (50,50) to corner (0,0 or 100,100)
-      const distanceX = Math.abs(leftPercent - 50);
-      const distanceY = Math.abs(topPercent - 50);
-      const distance = Math.sqrt(distanceX**2 + distanceY**2);
-      
-      // Map distance to scale (closer = bigger, farther = smaller)
-      const minScale = 0.3; // Reduced minimum scale
-      const maxScale = 2.0; // Increased maximum scale
-      const normalizedDistance = Math.min(distance / maxDistance, 1);
-      const scale = maxScale - normalizedDistance * (maxScale - minScale);
-      
-      return scale;
-    };
-
-    const initialTop = getRandomPercent();
-    const initialLeft = getRandomPercent();
-    const targetTop = getRandomPercent();
-    const targetLeft = getRandomPercent();
-    const initialScale = calculateScale(initialTop, initialLeft);
-    const targetScale = calculateScale(targetTop, targetLeft);
-    // --- End Perspective Scaling Logic ---
-
-    // --- Apply Formatting Classes --- 
+    // For mobile, reduce size by 40% but ensure minimum of 10px
+    if (isMobile) {
+      sizePx = Math.max(Math.floor(sizePx * 0.6), 10);
+    }
+    
+    const baseTextStyle = getTextStyle(color, sizePx, fontFamily, spacing);
+    
+    // Apply formatting classes
     const formattingClasses = [
       isBold ? 'font-bold' : '',
       isItalic ? 'italic' : '',
       isStrikethrough ? 'line-through' : '',
     ].filter(Boolean).join(' ');
-    // --- End Formatting Classes --- 
+
+    // Position each element
+    let position;
+    
+    // Determine the position for each index
+    // 0: center
+    // 1: top-left, 2: top-center, 3: top-right
+    // 4: middle-left, 5: middle-right
+    // 6: bottom-left, 7: bottom-center, 8: bottom-right
+    switch (index) {
+      case 0: // Center
+        position = "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2";
+        break;
+      case 1: // Top-left
+        position = "absolute top-[20%] left-[20%] transform -translate-x-1/2 -translate-y-1/2";
+        break;
+      case 2: // Top-center
+        position = "absolute top-[20%] left-1/2 transform -translate-x-1/2 -translate-y-1/2";
+        break;
+      case 3: // Top-right
+        position = "absolute top-[20%] right-[20%] transform translate-x-1/2 -translate-y-1/2";
+        break;
+      case 4: // Middle-left
+        position = "absolute top-1/2 left-[20%] transform -translate-x-1/2 -translate-y-1/2";
+        break;
+      case 5: // Middle-right
+        position = "absolute top-1/2 right-[20%] transform translate-x-1/2 -translate-y-1/2";
+        break;
+      case 6: // Bottom-left
+        position = "absolute bottom-[20%] left-[20%] transform -translate-x-1/2 translate-y-1/2";
+        break;
+      case 7: // Bottom-center
+        position = "absolute bottom-[20%] left-1/2 transform -translate-x-1/2 translate-y-1/2";
+        break;
+      case 8: // Bottom-right
+        position = "absolute bottom-[20%] right-[20%] transform translate-x-1/2 translate-y-1/2";
+        break;
+      default:
+        position = "";
+    }
 
     return (
-      <motion.span
+      <div 
         key={index}
-        className={`effect-text ${effectClass} ${formattingClasses} absolute whitespace-nowrap`}
-        // Apply base styles + transform to center the element on its top/left coordinate
-        style={{ ...baseTextStyle, transform: 'translate(-50%, -50%)' }}
-        initial={{
-          top: `${initialTop}%`,
-          left: `${initialLeft}%`,
-          scale: initialScale,
-        }}
-        animate={{
-          top: `${targetTop}%`,
-          left: `${targetLeft}%`,
-          scale: targetScale,
-        }}
-        transition={{
-          duration: duration,
-          repeat: Infinity,
-          repeatType: "mirror",
-          ease: "easeInOut",
-        }}
+        className={position}
       >
-        {text}
-      </motion.span>
+        <span
+          className={`effect-text ${effectClass} ${formattingClasses} max-w-[80vw] overflow-hidden text-ellipsis text-center`}
+          style={baseTextStyle}
+        >
+          {text}
+        </span>
+      </div>
     );
   });
 
@@ -130,7 +154,7 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
       className={`${baseClasses} ${conditionalClasses}`}
     >
       {text && containerSize.width > 0 ? (
-        textElements
+        <>{textElements}</>
       ) : (
         <div className="absolute inset-0 flex items-center justify-center text-gray-400 italic">
           {fullscreen ? 'Loading content...' : 'Enter some text to see the effect'}
