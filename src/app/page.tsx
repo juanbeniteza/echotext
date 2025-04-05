@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { useTextConfig } from '../hooks/useTextConfig';
 import TextDisplay from '../components/TextDisplay';
 import { Effect } from '../types';
-import { copyToClipboard } from '../utils/sharing';
+import { encodeConfig, ShareConfig } from '../lib/sharing';
 import { availableEffects, getEffectName, getEffectClass } from '../utils/effects';
-import { FiEye, FiX } from "react-icons/fi";
+import { FiEye, FiX, FiShare2, FiCheck } from "react-icons/fi";
+import { copyToClipboard } from '../utils/clipboard';
 
 // Formatting Button Component
 interface FormatButtonProps {
@@ -40,6 +41,7 @@ export default function Home() {
   } = useTextConfig();
   
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const handleEffectClick = (effect: Effect) => {
     setEffect(effect);
@@ -51,6 +53,38 @@ export default function Home() {
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
+    if (isCopied) setIsCopied(false);
+  };
+
+  const handleShare = async () => {
+    const shareableConfig: ShareConfig = {
+        text: config.text,
+        effect: config.effect,
+        color: config.color,
+        isBold: config.isBold,
+        isItalic: config.isItalic,
+        isStrikethrough: config.isStrikethrough,
+        fontSize: config.fontSize,
+        fontFamily: config.fontFamily,
+        spacing: config.spacing,
+        repeat: config.repeat,
+    };
+
+    const encoded = encodeConfig(shareableConfig);
+    if (!encoded) {
+      alert("Failed to generate share link.");
+      return;
+    }
+
+    const shareUrl = `${window.location.origin}/s/${encoded}`;
+
+    const success = await copyToClipboard(shareUrl);
+    if (success) {
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+    } else {
+        alert("Failed to copy link to clipboard.");
+    }
   };
 
   return (
@@ -143,6 +177,19 @@ export default function Home() {
           >
             {isFullscreen ? <FiX className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
             <span>{isFullscreen ? "Exit" : "Preview"}</span>
+          </button>
+
+          <button 
+            className={`flex items-center justify-center gap-2 px-6 py-3 border rounded-lg font-medium transition duration-150 ease-in-out shadow-sm 
+                       ${isCopied 
+                         ? 'bg-green-100 border-green-300 text-green-700' 
+                         : 'bg-indigo-50 border-indigo-200 text-indigo-600 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+            onClick={handleShare}
+            disabled={isCopied}
+            aria-label="Share EchoText configuration"
+          >
+            {isCopied ? <FiCheck className="h-5 w-5" /> : <FiShare2 className="h-5 w-5" />}
+            <span>{isCopied ? "Copied!" : "Share"}</span>
           </button>
         </div>
       </div> 

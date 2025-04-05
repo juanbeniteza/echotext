@@ -2,11 +2,11 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TextConfig } from '../types';
+import { TextConfig, Effect } from '../types';
 import { getEffectClass, getTextStyle } from '../utils/effects';
 
 interface TextDisplayProps {
-  config: TextConfig;
+  config: Omit<TextConfig, 'effect'> & { effect: Effect | null };
   fullscreen?: boolean;
 }
 
@@ -16,7 +16,7 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
 }) => {
   const {
     text, 
-    effect, 
+    effect,
     color, 
     fontSize, 
     fontFamily, 
@@ -75,7 +75,8 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
 
   // Generate text elements (30 for desktop, 20 for mobile)
   const textElements = Array.from({ length: instanceCount }, (_, index) => {
-    const effectClass = getEffectClass(effect);
+    // Get effect class only if effect is not null
+    const effectClass = effect ? getEffectClass(effect) : '';
     
     // Adjust font size for mobile
     let sizePx = typeof fontSize === 'string' ? parseInt(fontSize) : fontSize;
@@ -221,6 +222,9 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
         break;
     }
 
+    // Apply effect class only if effect is present
+    const appliedEffectClass = effect ? effectClass : '';
+
     return (
       <motion.div 
         key={index}
@@ -236,7 +240,7 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
         }}
       >
         <div
-          className={`effect-text ${effectClass} ${formattingClasses} text-center whitespace-nowrap`}
+          className={`effect-text ${appliedEffectClass} ${formattingClasses} text-center whitespace-nowrap`}
           style={adjustedTextStyle}
         >
           {text}
