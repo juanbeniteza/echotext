@@ -6,7 +6,8 @@ import TextDisplay from '../components/TextDisplay';
 import { Effect } from '../types';
 import { useSupabase } from '../hooks/useSupabase';
 import { generateShareableUrl, copyToClipboard } from '../utils/sharing';
-import { availableEffects, getEffectName } from '../utils/effects';
+import { availableEffects, getEffectName, getEffectClass } from '../utils/effects';
+import { FiEye, FiLink, FiX } from "react-icons/fi";
 
 // Formatting Button Component
 interface FormatButtonProps {
@@ -99,15 +100,23 @@ export default function Home() {
           
           {/* Effect Buttons Group */}
           <div className="flex flex-wrap items-center justify-center gap-3">
-            {availableEffects.map((effectKey) => (
-              <button
-                key={effectKey}
-                className={`px-4 py-2 border rounded-lg font-medium transition duration-150 ease-in-out text-sm ${config.effect === effectKey ? 'bg-indigo-100 border-indigo-300 text-indigo-700 shadow-inner' : 'border-gray-300 text-gray-600 hover:bg-gray-50 bg-white bg-opacity-75'}`}
-                onClick={() => handleEffectClick(effectKey)}
-              >
-                {getEffectName(effectKey)}
-              </button>
-            ))}
+            {availableEffects.map((effectKey) => {
+              const isActive = config.effect === effectKey;
+              // Get the effect class string if this button is active
+              const effectClass = isActive ? getEffectClass(effectKey) : '';
+              return (
+                <button
+                  key={effectKey}
+                  className={`px-4 py-2 border rounded-lg font-medium transition duration-150 ease-in-out text-sm ${isActive ? 'bg-indigo-100 border-indigo-300 text-indigo-700 shadow-inner' : 'border-gray-300 text-gray-600 hover:bg-gray-50 bg-white bg-opacity-75'} md:w-auto`}
+                  onClick={() => handleEffectClick(effectKey)}
+                >
+                  {/* Apply effect class to the text span when active */}
+                  <span className={isActive ? `effect-text ${effectClass}` : ''}>
+                    {getEffectName(effectKey)}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Formatting & Color Group (Shows border on medium+) */}
@@ -145,19 +154,25 @@ export default function Home() {
         {/* Action Buttons */}
         <div className="flex items-center space-x-4 pt-4">
           <button 
-            className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out shadow-sm bg-white bg-opacity-75"
+            className="flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out shadow-sm bg-white bg-opacity-75"
             onClick={toggleFullscreen}
             aria-label={isFullscreen ? "Exit fullscreen preview" : "Enter fullscreen preview"}
           >
-            {isFullscreen ? "Exit Preview" : "Preview"}
+            {isFullscreen ? <FiX className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+            <span>{isFullscreen ? "Exit" : "Preview"}</span>
           </button>
           <button
-            className="px-6 py-3 border border-transparent rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed transition duration-150 ease-in-out shadow-sm"
+            className="flex items-center justify-center gap-2 px-6 py-3 border border-transparent rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed transition duration-150 ease-in-out shadow-sm"
             onClick={handleGenerateLink}
             disabled={shareLoading || !config.text}
             aria-label="Generate shareable link"
           >
-            {shareLoading ? 'Generating...' : 'Generate Link'}
+            {shareLoading ? (
+              <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
+            ) : (
+              <FiLink className="h-5 w-5" /> 
+            )}
+            <span>{shareLoading ? 'Generating...' : 'Generate Link'}</span>
           </button>
         </div>
 
