@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "../styles/effects.css"; // Import our custom effects CSS
+import { ThemeProvider } from "../hooks/useTheme";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,8 +18,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      {/* Apply white background and ensure minimum height */}
-      <body className={`${inter.className} bg-white min-h-screen`}>{children}</body>
+      {/* Ensure minimum height */}
+      <body className={`${inter.className} min-h-screen`}>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

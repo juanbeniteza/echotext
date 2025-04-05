@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { decodeConfig, ShareConfig } from '../lib/sharing';
 import TextDisplay from './TextDisplay'; 
+import ThemeToggle from './ThemeToggle';
 import Link from 'next/link';
 
 interface SharedViewProps {
@@ -58,21 +59,31 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <p className="text-lg text-gray-600">Loading shared content...</p>
+      <div className="flex flex-col justify-center items-center min-h-screen bg-dotted">
+        {/* Theme Toggle in the top-right corner */}
+        <div className="absolute top-4 right-4 z-[30]">
+          <ThemeToggle />
+        </div>
+        <div className="p-6 rounded-xl">
+          <p className="text-xl font-medium text-gray-800 dark:text-white">Loading shared content...</p>
+        </div>
       </div>
     );
   }
 
   if (error || !config || !config.text || config.text.trim() === '') {
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 p-8">
-        <div className="max-w-md text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-3">Invalid Link</h2>
-          <p className="text-gray-600 mb-8">{error || "The URL you're trying to access is not valid."}</p>
+      <div className="flex flex-col justify-center items-center min-h-screen bg-dotted p-8 dark:text-white">
+        {/* Theme Toggle in the top-right corner */}
+        <div className="absolute top-4 right-4 z-[30]">
+          <ThemeToggle />
+        </div>
+        <div className="max-w-md text-center p-8 rounded-xl">
+          <h2 className="text-3xl font-bold mb-4 foreground">Invalid Link</h2>
+          <p className="mb-8 foreground text-lg">{error || "The URL you're trying to access is not valid."}</p>
           <Link 
             href="/" 
-            className="px-6 py-3 bg-indigo-600 text-white text-center rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 ease-in-out font-medium"
+            className="px-6 py-3 bg-indigo-600 text-white text-center rounded-lg shadow-md hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 transition duration-150 ease-in-out font-medium"
           >
             Go to EchoText Home
           </Link>
@@ -87,12 +98,17 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
         <TextDisplay config={config} fullscreen={true} />
       </div>
       
+      {/* Theme Toggle in the top-right corner */}
+      <div className="absolute top-4 right-4 z-[30]">
+        <ThemeToggle />
+      </div>
+      
       {/* Action buttons container */}
       <div className="absolute top-4 left-4 z-[30]">
         {/* Create your own button */}
         <Link 
           href="/" 
-          className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition duration-150 ease-in-out text-sm font-medium"
+          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white rounded-lg shadow-md transition duration-150 ease-in-out text-sm font-medium"
         >
           Create your own EchoText
         </Link>

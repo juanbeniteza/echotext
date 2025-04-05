@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTextConfig } from '../hooks/useTextConfig';
 import TextDisplay from '../components/TextDisplay';
+import ThemeToggle from '../components/ThemeToggle';
 import { Effect } from '../types';
 import { encodeConfig, ShareConfig } from '../lib/sharing';
 import { availableEffects, getEffectName, getEffectClass } from '../utils/effects';
@@ -23,7 +24,11 @@ const FormatButton: React.FC<FormatButtonProps> = ({ label, isActive, onClick, c
     aria-label={`Toggle ${label}`}
     aria-pressed={isActive}
     onClick={onClick}
-    className={`px-3 py-1.5 border rounded-md transition duration-150 ease-in-out ${isActive ? 'bg-gray-200 border-gray-400 text-gray-800 shadow-inner' : 'border-gray-300 text-gray-500 hover:bg-gray-100 bg-white bg-opacity-75'}`}
+    className={`px-3 py-1.5 border rounded-md transition duration-150 ease-in-out ${
+      isActive 
+        ? 'bg-gray-200 border-gray-400 shadow-inner dark:bg-gray-700 dark:border-gray-600' 
+        : 'border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800'
+    }`}
   >
     {children}
   </button>
@@ -105,16 +110,21 @@ export default function Home() {
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center p-8 bg-dotted">
       
+      {/* Theme Toggle in the top-right corner */}
+      <div className="absolute top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
+      
       <div className="absolute top-16 md:top-20 left-1/2 transform -translate-x-1/2 text-center z-10">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900">EchoText</h1>
-        <p className="text-md md:text-lg text-gray-600 mt-2">Create text with mesmerizing effects</p>
+        <h1 className="text-4xl md:text-5xl font-bold">EchoText</h1>
+        <p className="text-md md:text-lg mt-2">Create text with mesmerizing effects</p>
       </div>
 
       <div className="w-full max-w-3xl flex flex-col items-center space-y-8 mt-32 md:mt-40">
         
         <input
           type="text"
-          className="w-full p-4 border border-gray-300 rounded-lg text-center text-2xl text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm transition duration-150 ease-in-out bg-white"
+          className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg text-center text-2xl text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm transition duration-150 ease-in-out bg-white dark:bg-gray-800"
           placeholder="Type your text here"
           value={config.text}
           onChange={(e) => setText(e.target.value)}
@@ -123,7 +133,7 @@ export default function Home() {
         />
 
         {/* Character limit indicator */}
-        <div className="text-xs text-gray-500 -mt-6 self-end mr-2">
+        <div className="text-xs -mt-6 self-end mr-2">
           {config.text.length}/20 characters
         </div>
 
@@ -139,7 +149,11 @@ export default function Home() {
               return (
                 <button
                   key={effectKey}
-                  className={`px-4 py-2 border rounded-lg font-medium transition duration-150 ease-in-out text-sm ${isActive ? 'bg-indigo-100 border-indigo-300 text-indigo-700 shadow-inner' : 'border-gray-300 text-gray-600 hover:bg-gray-50 bg-white bg-opacity-75'} md:w-auto`}
+                  className={`px-4 py-2 border rounded-lg font-medium transition duration-150 ease-in-out text-sm ${
+                    isActive 
+                      ? 'bg-indigo-100 border-indigo-300 text-indigo-700 shadow-inner dark:bg-indigo-900 dark:border-indigo-700 dark:text-indigo-300' 
+                      : 'border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800'
+                  } md:w-auto`}
                   onClick={() => handleEffectClick(effectKey)}
                 >
                   {/* Apply effect class to the text span when active */}
@@ -152,7 +166,7 @@ export default function Home() {
           </div>
 
           {/* Formatting & Color Group (Shows border on medium+) */}
-          <div className="flex items-center space-x-3 md:space-x-4 md:border-l md:border-gray-300 md:pl-4">
+          <div className="flex items-center space-x-3 md:space-x-4 md:border-l md:border-gray-300 md:dark:border-gray-700 md:pl-4">
             {/* Formatting Buttons */}
             <div className="flex items-center space-x-2">
               <FormatButton label="Bold" isActive={config.isBold} onClick={toggleBold}>
@@ -167,7 +181,7 @@ export default function Home() {
             </div>
             
             {/* Color input */}
-            <div className="relative h-10 w-10 md:h-12 md:w-12 rounded-full border border-gray-300 overflow-hidden shadow-sm bg-white">
+            <div className="relative h-10 w-10 md:h-12 md:w-12 rounded-full border border-gray-300 dark:border-gray-700 overflow-hidden shadow-sm">
               <input
                 type="color"
                 className="absolute inset-0 w-full h-full cursor-pointer opacity-0"
@@ -176,7 +190,7 @@ export default function Home() {
                 aria-label="Select text color"
               />
               <div 
-                className="absolute inset-0 w-full h-full rounded-full border-4 border-white pointer-events-none"
+                className="absolute inset-0 w-full h-full rounded-full border-4 border-white dark:border-gray-800 pointer-events-none"
                 style={{ backgroundColor: config.color }}
               />
             </div>
@@ -186,7 +200,7 @@ export default function Home() {
         {/* Action Buttons */}
         <div className="flex items-center space-x-4 pt-4">
           <button 
-            className="flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out shadow-sm bg-white bg-opacity-75"
+            className="flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out shadow-sm bg-white dark:bg-gray-800"
             onClick={toggleFullscreen}
             aria-label={isFullscreen ? "Exit fullscreen preview" : "Enter fullscreen preview"}
           >
@@ -197,8 +211,8 @@ export default function Home() {
           <button 
             className={`flex items-center justify-center gap-2 px-6 py-3 border rounded-lg font-medium transition duration-150 ease-in-out shadow-sm 
                        ${isCopied 
-                         ? 'bg-green-100 border-green-300 text-green-700' 
-                         : 'bg-indigo-50 border-indigo-200 text-indigo-600 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}
+                         ? 'bg-green-100 border-green-300 text-green-700 dark:bg-green-900 dark:border-green-700 dark:text-green-300' 
+                         : 'bg-indigo-50 border-indigo-200 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:bg-indigo-900/80 dark:border-indigo-800 dark:hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}
                        ${!config.text.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={handleShare}
             disabled={isCopied || !config.text.trim()}
@@ -211,19 +225,19 @@ export default function Home() {
 
         {/* Share URL display section */}
         {shareUrl && (
-          <div className="w-full mt-4 border border-gray-200 rounded-lg p-4 bg-white bg-opacity-90 shadow-sm">
+          <div className="w-full mt-4 border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800/95 shadow-sm">
             <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-700 font-medium">Share Link:</p>
+              <p className="text-sm font-medium">Share Link:</p>
               <button
                 onClick={handleCopyLink}
-                className="text-indigo-600 hover:text-indigo-800 transition-colors p-1"
+                className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors p-1"
                 aria-label="Copy share URL"
               >
                 <FiCopy className="h-4 w-4" />
               </button>
             </div>
-            <div className="mt-2 bg-gray-50 p-3 rounded-md overflow-x-auto">
-              <code className="text-xs sm:text-sm break-all text-gray-800">{shareUrl}</code>
+            <div className="mt-2 bg-gray-50 dark:bg-gray-900/80 p-3 rounded-md overflow-x-auto">
+              <code className="text-xs sm:text-sm break-all text-gray-800 dark:text-gray-200">{shareUrl}</code>
             </div>
           </div>
         )}
@@ -234,14 +248,19 @@ export default function Home() {
         <div className="fixed inset-0 z-50 bg-dotted flex items-center justify-center p-4 overflow-auto">
           <TextDisplay config={config} fullscreen={true} />
           
-          {/* Button controls container - add flex for positioning multiple buttons */}
-          <div className="fixed top-4 right-4 z-[51] flex gap-2">
+          {/* Theme toggle button stays at top right */}
+          <div className="fixed top-4 right-4 z-[51]">
+            <ThemeToggle />
+          </div>
+          
+          {/* Action buttons moved to top left */}
+          <div className="fixed top-4 left-4 z-[51] flex gap-2">
             {/* Copy Link Button */}
             <button 
               className={`flex items-center justify-center gap-2 px-4 py-2 border rounded-lg transition duration-150 ease-in-out shadow-md 
                         ${isCopied 
-                          ? 'bg-green-100 border-green-300 text-green-700' 
-                          : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}
+                          ? 'bg-green-100 border-green-300 text-green-700 dark:bg-green-900 dark:border-green-700 dark:text-green-300' 
+                          : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'}
                         ${!config.text.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={handleShare}
               disabled={isCopied || !config.text.trim()}
@@ -253,7 +272,7 @@ export default function Home() {
             
             {/* Close Preview Button */}
             <button 
-              className="px-4 py-2 bg-white rounded-lg shadow-md text-gray-700 font-medium hover:bg-gray-100 transition duration-150 ease-in-out border border-gray-300"
+              className="px-4 py-2 rounded-lg shadow-md font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150 ease-in-out border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
               onClick={toggleFullscreen}
               aria-label="Exit fullscreen preview"
             >

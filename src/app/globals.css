@@ -12,11 +12,9 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 body {
@@ -27,7 +25,11 @@ body {
 
 /* Dotted Background Pattern */
 .bg-dotted {
-  background-color: #ffffff; /* Fallback white */
+  background-color: var(--background);
   background-image: radial-gradient(circle, #e5e7eb 1px, transparent 1px);
   background-size: 10px 10px; /* Adjust size of dots and spacing */
+}
+
+[data-theme="dark"] .bg-dotted {
+  background-image: radial-gradient(circle, #333333 1px, transparent 1px);
 }

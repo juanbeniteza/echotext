@@ -5,7 +5,7 @@ import { TextConfig, Effect } from '../types';
 export const DEFAULT_CONFIG: TextConfig = {
   text: '', // Start with empty text
   effect: Effect.NONE,
-  color: '#000000',
+  color: '#FF0000',
   fontSize: 30, // Adjusted from 24 to better fit our min/max scale range
   fontFamily: 'Arial, sans-serif',
   spacing: 0,
