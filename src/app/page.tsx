@@ -147,7 +147,7 @@ export default function Home() {
         <a 
           href={process.env.NEXT_PUBLIC_AUTHOR_URL || "https://juanbenitez.dev"}
           target="_blank" 
-          rel="noopener noreferrer" 
+          rel="noopener" 
           className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
         >
           author
@@ -303,7 +303,7 @@ export default function Home() {
             <a 
               href={process.env.NEXT_PUBLIC_AUTHOR_URL || "https://juanbenitez.dev"}
               target="_blank" 
-              rel="noopener noreferrer" 
+              rel="noopener" 
               className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
             >
               author
