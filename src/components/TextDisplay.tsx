@@ -223,12 +223,8 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
         }}
       >
         <div
-          className={`effect-text ${effectClass} ${formattingClasses} max-w-[50vw] md:max-w-[40vw] text-center break-words hyphens-auto`}
-          style={{
-            ...adjustedTextStyle,
-            wordWrap: 'break-word',
-            overflowWrap: 'break-word'
-          }}
+          className={`effect-text ${effectClass} ${formattingClasses} text-center whitespace-nowrap`}
+          style={adjustedTextStyle}
         >
           {text}
         </div>
