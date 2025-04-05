@@ -1,20 +1,4 @@
 /**
- * Generate a full URL for sharing
- * @param id The ID of the saved configuration
- * @returns The full URL to share
- */
-export const generateShareableUrl = (id: string): string => {
-  // Use window.location in the browser to get the base URL
-  if (typeof window !== 'undefined') {
-    const baseUrl = `${window.location.protocol}//${window.location.host}`;
-    return `${baseUrl}/${id}`;
-  }
-  
-  // If running on the server, just return the ID part
-  return `/${id}`;
-};
-
-/**
  * Copy text to clipboard
  * @param text The text to copy
  * @returns Promise that resolves when text is copied

@@ -70,8 +70,11 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
     }
   }, []); // Only run once on mount
 
-  // Generate 20 text elements
-  const textElements = Array.from({ length: 20 }, (_, index) => {
+  // Calculate the number of instances based on device type
+  const instanceCount = isMobile ? 20 : 30;
+
+  // Generate text elements (30 for desktop, 20 for mobile)
+  const textElements = Array.from({ length: instanceCount }, (_, index) => {
     const effectClass = getEffectClass(effect);
     
     // Adjust font size for mobile

@@ -4,10 +4,9 @@ import { useState } from 'react';
 import { useTextConfig } from '../hooks/useTextConfig';
 import TextDisplay from '../components/TextDisplay';
 import { Effect } from '../types';
-import { useSupabase } from '../hooks/useSupabase';
-import { generateShareableUrl, copyToClipboard } from '../utils/sharing';
+import { copyToClipboard } from '../utils/sharing';
 import { availableEffects, getEffectName, getEffectClass } from '../utils/effects';
-import { FiEye, FiLink, FiX } from "react-icons/fi";
+import { FiEye, FiX } from "react-icons/fi";
 
 // Formatting Button Component
 interface FormatButtonProps {
@@ -40,9 +39,6 @@ export default function Home() {
     toggleStrikethrough,
   } = useTextConfig();
   
-  const { saveConfig, loading: shareLoading, error: shareError } = useSupabase();
-  const [shareableUrl, setShareableUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleEffectClick = (effect: Effect) => {
@@ -51,25 +47,6 @@ export default function Home() {
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setColor(e.target.value);
-  };
-
-  const handleGenerateLink = async () => {
-    const id = await saveConfig(config);
-    if (id) {
-      const url = generateShareableUrl(id);
-      setShareableUrl(url);
-      setCopied(false);
-    }
-  };
-
-  const handleCopyLink = async (urlToCopy: string | null = shareableUrl) => {
-    if (urlToCopy) {
-      const success = await copyToClipboard(urlToCopy);
-      if (success) {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      }
-    }
   };
 
   const toggleFullscreen = () => {
@@ -81,7 +58,7 @@ export default function Home() {
       
       <div className="absolute top-16 md:top-20 left-1/2 transform -translate-x-1/2 text-center z-10">
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900">EchoText</h1>
-        <p className="text-md md:text-lg text-gray-600 mt-2">Create and share text with mesmerizing effects</p>
+        <p className="text-md md:text-lg text-gray-600 mt-2">Create text with mesmerizing effects</p>
       </div>
 
       <div className="w-full max-w-3xl flex flex-col items-center space-y-8 mt-32 md:mt-40">
@@ -167,44 +144,7 @@ export default function Home() {
             {isFullscreen ? <FiX className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
             <span>{isFullscreen ? "Exit" : "Preview"}</span>
           </button>
-          <button
-            className="flex items-center justify-center gap-2 px-6 py-3 border border-transparent rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed transition duration-150 ease-in-out shadow-sm"
-            onClick={handleGenerateLink}
-            disabled={shareLoading || !config.text}
-            aria-label="Generate shareable link"
-          >
-            {shareLoading ? (
-              <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
-            ) : (
-              <FiLink className="h-5 w-5" /> 
-            )}
-            <span>{shareLoading ? 'Generating...' : 'Generate Link'}</span>
-          </button>
         </div>
-
-        {/* Generated Link Display */}
-        {shareError && (
-          <div className="text-red-600 text-sm mt-2 font-medium">Error: {shareError}</div>
-        )}
-        {shareableUrl && (
-          <div className="mt-4 w-full flex items-center space-x-2 p-4 bg-gray-100 rounded-lg">
-            <input
-              type="text"
-              className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white text-gray-700 text-sm"
-              value={shareableUrl}
-              readOnly
-              aria-label="Shareable URL"
-            />
-            <button
-              type="button"
-              className="py-2 px-4 bg-gray-700 text-white font-medium rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out shadow-sm text-sm"
-              onClick={() => handleCopyLink()}
-              aria-label="Copy link to clipboard"
-            >
-              {copied ? 'Copied!' : 'Copy'}
-            </button>
-          </div>
-        )}
       </div> 
 
       {/* Fullscreen Preview */}
