@@ -147,15 +147,16 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
     
     // Create unique animation properties for each position
     const floatingAnimation = {
-      y: [0, ((index % 3) - 1) * 8],  // Values between -8 to 8
-      x: [0, ((index % 4) - 1.5) * 6] // Values between -9 to 9
+      // Create a more complex multi-point path instead of just start-to-end
+      y: [0, ((index % 3) - 1) * 12, ((index % 2) - 0.5) * 15, ((index % 3) - 1) * 10, 0],  
+      x: [0, ((index % 4) - 1.5) * 10, ((index % 5) - 2) * 12, ((index % 3) - 1) * 8, 0]
     };
     
-    // Different durations for each instance
-    const duration = 3 + (index % 5);
+    // Different durations for each instance - increase overall duration to make movement smoother
+    const duration = 6 + (index % 7);
     
     // Slightly offset each animation
-    const delay = index * 0.2;
+    const delay = index * 0.3;
 
     return (
       <motion.div 
