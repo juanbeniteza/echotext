@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { TextConfig, Effect } from '../types';
 import { getEffectClass, getTextStyle } from '../utils/effects';
 
@@ -21,7 +21,6 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
     fontSize, 
     fontFamily, 
     spacing, 
-    repeat,
     // Formatting flags
     isBold,
     isItalic,
@@ -57,7 +56,7 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
       setContainerSize({ width: offsetWidth, height: offsetHeight });
 
       const resizeObserver = new ResizeObserver(entries => {
-        for (let entry of entries) {
+        for (const entry of entries) {
           setContainerSize({ width: entry.contentRect.width, height: entry.contentRect.height });
         }
         checkMobile(); // Also check mobile on resize

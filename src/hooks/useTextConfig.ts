@@ -26,7 +26,7 @@ export const useTextConfig = (initialConfig: Partial<TextConfig> = {}) => {
       ...DEFAULT_CONFIG,
       ...initialConfig,
     });
-  }, []);
+  }, [initialConfig]);
 
   // Update the entire configuration
   const setFullConfig = useCallback((newConfig: TextConfig) => {

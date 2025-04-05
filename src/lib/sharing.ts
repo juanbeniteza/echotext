@@ -19,7 +19,9 @@ function safeBase64Decode(base64: string): string {
   try {
     // Browser environment
     return atob(paddedBase64);
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   } catch (e) {
+  /* eslint-enable @typescript-eslint/no-unused-vars */
     // Node.js environment
     if (typeof Buffer !== 'undefined') {
       const buffer = Buffer.from(paddedBase64, 'base64');
@@ -91,7 +93,9 @@ function safeBase64Encode(binaryStr: string): string {
   try {
     // Browser environment
     return btoa(binaryStr);
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   } catch (e) {
+  /* eslint-enable @typescript-eslint/no-unused-vars */
     // Node.js environment
     if (typeof Buffer !== 'undefined') {
       const buffer = Buffer.from(binaryStr, 'binary');
@@ -210,7 +214,9 @@ export function decodeConfig(encodedString: string): ShareConfig | null {
         try {
           // Decompress using pako
           decompressed = pako.inflate(bytes, { to: 'string' });
+        /* eslint-disable @typescript-eslint/no-unused-vars */
         } catch (decompressionError) {
+        /* eslint-enable @typescript-eslint/no-unused-vars */
            // console.error("Pako decompression error:", decompressionError);
           return null;
         }
