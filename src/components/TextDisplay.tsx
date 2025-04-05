@@ -64,16 +64,51 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
     }
   }, []); // Only run once on mount
 
-  // Generate 9 equally distributed text elements
-  const textElements = Array.from({ length: 9 }, (_, index) => {
+  // Predefined position classes for 20 elements
+  const positions = [
+    // Center
+    "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+    
+    // Top row
+    "absolute top-[15%] left-[15%] -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[15%] left-[35%] -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[15%] left-1/2 -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[15%] left-[65%] -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[15%] left-[85%] -translate-x-1/2 -translate-y-1/2",
+    
+    // Second row
+    "absolute top-[35%] left-[20%] -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[35%] left-[40%] -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[35%] left-[60%] -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[35%] left-[80%] -translate-x-1/2 -translate-y-1/2",
+    
+    // Third row
+    "absolute top-[65%] left-[25%] -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[65%] left-[50%] -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[65%] left-[75%] -translate-x-1/2 -translate-y-1/2",
+    
+    // Bottom row
+    "absolute top-[85%] left-[15%] -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[85%] left-[35%] -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[85%] left-1/2 -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[85%] left-[65%] -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[85%] left-[85%] -translate-x-1/2 -translate-y-1/2",
+    
+    // Extra positions for corners
+    "absolute top-[25%] left-[25%] -translate-x-1/2 -translate-y-1/2",
+    "absolute top-[75%] left-[75%] -translate-x-1/2 -translate-y-1/2"
+  ];
+
+  // Generate 20 text elements
+  const textElements = Array.from({ length: 20 }, (_, index) => {
     const effectClass = getEffectClass(effect);
     
     // Adjust font size for mobile
     let sizePx = typeof fontSize === 'string' ? parseInt(fontSize) : fontSize;
     
-    // For mobile, reduce size by 40% but ensure minimum of 10px
+    // For mobile, reduce size by 15% but ensure minimum of 14px
     if (isMobile) {
-      sizePx = Math.max(Math.floor(sizePx * 0.6), 10);
+      sizePx = Math.max(Math.floor(sizePx * 0.85), 14);
     }
     
     const baseTextStyle = getTextStyle(color, sizePx, fontFamily, spacing);
@@ -85,55 +120,39 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
       isStrikethrough ? 'line-through' : '',
     ].filter(Boolean).join(' ');
 
-    // Position each element
-    let position;
+    // Position based on predefined array
+    const position = positions[index % positions.length];
     
-    // Determine the position for each index
-    // 0: center
-    // 1: top-left, 2: top-center, 3: top-right
-    // 4: middle-left, 5: middle-right
-    // 6: bottom-left, 7: bottom-center, 8: bottom-right
-    switch (index) {
-      case 0: // Center
-        position = "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2";
-        break;
-      case 1: // Top-left
-        position = "absolute top-[20%] left-[20%] transform -translate-x-1/2 -translate-y-1/2";
-        break;
-      case 2: // Top-center
-        position = "absolute top-[20%] left-1/2 transform -translate-x-1/2 -translate-y-1/2";
-        break;
-      case 3: // Top-right
-        position = "absolute top-[20%] right-[20%] transform translate-x-1/2 -translate-y-1/2";
-        break;
-      case 4: // Middle-left
-        position = "absolute top-1/2 left-[20%] transform -translate-x-1/2 -translate-y-1/2";
-        break;
-      case 5: // Middle-right
-        position = "absolute top-1/2 right-[20%] transform translate-x-1/2 -translate-y-1/2";
-        break;
-      case 6: // Bottom-left
-        position = "absolute bottom-[20%] left-[20%] transform -translate-x-1/2 translate-y-1/2";
-        break;
-      case 7: // Bottom-center
-        position = "absolute bottom-[20%] left-1/2 transform -translate-x-1/2 translate-y-1/2";
-        break;
-      case 8: // Bottom-right
-        position = "absolute bottom-[20%] right-[20%] transform translate-x-1/2 translate-y-1/2";
-        break;
-      default:
-        position = "";
+    // Create more dramatic size variation between instances
+    // Define specific indices that will have larger sizes for visual focus
+    const largeIndices = [0, 3, 11, 18]; // Center, top-right, middle, bottom
+    const mediumIndices = [1, 7, 13, 16]; // Evenly distributed secondary focus
+    
+    let sizeMultiplier;
+    if (largeIndices.includes(index)) {
+      // Large focal points (120-150% of original size)
+      sizeMultiplier = 1.2 + (index % 4) * 0.1;
+    } else if (mediumIndices.includes(index)) {
+      // Medium elements (90-110% of original size)
+      sizeMultiplier = 0.9 + (index % 3) * 0.1;
+    } else {
+      // Smaller background elements (50-85% of original size)
+      sizeMultiplier = 0.5 + (index % 8) * 0.05;
     }
     
-    // Create unique animation properties for each position
-    // Using different ranges for x/y and different durations for more natural motion
-    const floatingAnimation = {
-      y: [0, index % 3 === 0 ? -10 : (index % 3 === 1 ? 8 : -6)],
-      x: [0, index % 3 === 0 ? 5 : (index % 3 === 1 ? -8 : 6)]
+    const adjustedTextStyle = {
+      ...baseTextStyle,
+      fontSize: `${parseInt(baseTextStyle.fontSize as string) * sizeMultiplier}px`
     };
     
-    // Different durations for each instance based on position
-    const duration = 4 + (index * 0.5);
+    // Create unique animation properties for each position
+    const floatingAnimation = {
+      y: [0, ((index % 3) - 1) * 8],  // Values between -8 to 8
+      x: [0, ((index % 4) - 1.5) * 6] // Values between -9 to 9
+    };
+    
+    // Different durations for each instance
+    const duration = 3 + (index % 5);
     
     // Slightly offset each animation
     const delay = index * 0.2;
@@ -152,8 +171,8 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
         }}
       >
         <div
-          className={`effect-text ${effectClass} ${formattingClasses} max-w-[80vw] overflow-hidden text-ellipsis text-center`}
-          style={baseTextStyle}
+          className={`effect-text ${effectClass} ${formattingClasses} max-w-[50vw] md:max-w-[30vw] whitespace-nowrap overflow-hidden text-ellipsis text-center`}
+          style={adjustedTextStyle}
         >
           {text}
         </div>
