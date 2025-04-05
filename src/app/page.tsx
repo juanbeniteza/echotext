@@ -26,8 +26,8 @@ const FormatButton: React.FC<FormatButtonProps> = ({ label, isActive, onClick, c
     onClick={onClick}
     className={`px-3 py-1.5 border rounded-md transition duration-150 ease-in-out ${
       isActive 
-        ? 'bg-gray-200 border-gray-400 shadow-inner dark:bg-gray-700 dark:border-gray-600' 
-        : 'border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800'
+        ? 'bg-indigo-100 border-indigo-300 shadow-inner dark:bg-indigo-900 dark:border-indigo-700' 
+        : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-white dark:border-gray-400 text-gray-800 dark:text-gray-800'
     }`}
   >
     {children}
@@ -115,9 +115,21 @@ export default function Home() {
         <ThemeToggle />
       </div>
       
+      {/* Author attribution link in bottom-right */}
+      <div className="absolute bottom-4 right-4 z-10">
+        <a 
+          href="https://juanbenitez.dev" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+        >
+          author
+        </a>
+      </div>
+      
       <div className="absolute top-16 md:top-20 left-1/2 transform -translate-x-1/2 text-center z-10">
-        <h1 className="text-4xl md:text-5xl font-bold">EchoText</h1>
-        <p className="text-md md:text-lg mt-2">Create text with mesmerizing effects</p>
+        <h1 className="text-4xl md:text-5xl font-bold">~ echotext ~</h1>
+        <p className="text-md md:text-lg mt-2">create text with mesmerizing effects</p>
       </div>
 
       <div className="w-full max-w-3xl flex flex-col items-center space-y-8 mt-32 md:mt-40">
@@ -152,12 +164,12 @@ export default function Home() {
                   className={`px-4 py-2 border rounded-lg font-medium transition duration-150 ease-in-out text-sm ${
                     isActive 
                       ? 'bg-indigo-100 border-indigo-300 text-indigo-700 shadow-inner dark:bg-indigo-900 dark:border-indigo-700 dark:text-indigo-300' 
-                      : 'border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800'
+                      : 'bg-white border-gray-300 hover:bg-gray-50 dark:bg-white dark:border-gray-400 text-gray-800 dark:text-gray-800'
                   } md:w-auto`}
                   onClick={() => handleEffectClick(effectKey)}
                 >
                   {/* Apply effect class to the text span when active */}
-                  <span className={isActive ? `effect-text ${effectClass}` : ''}>
+                  <span className={isActive ? `effect-text ${effectClass} text-indigo-700 dark:text-indigo-300` : ''}>
                     {getEffectName(effectKey)}
                   </span>
                 </button>
@@ -170,13 +182,13 @@ export default function Home() {
             {/* Formatting Buttons */}
             <div className="flex items-center space-x-2">
               <FormatButton label="Bold" isActive={config.isBold} onClick={toggleBold}>
-                <span className="font-bold">B</span>
+                <span className={`font-bold ${config.isBold ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-800 dark:text-gray-800'}`}>B</span>
               </FormatButton>
               <FormatButton label="Italic" isActive={config.isItalic} onClick={toggleItalic}>
-                <span className="italic">I</span>
+                <span className={`italic ${config.isItalic ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-800 dark:text-gray-800'}`}>I</span>
               </FormatButton>
               <FormatButton label="Strikethrough" isActive={config.isStrikethrough} onClick={toggleStrikethrough}>
-                <span className="line-through">S</span>
+                <span className={`line-through ${config.isStrikethrough ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-800 dark:text-gray-800'}`}>S</span>
               </FormatButton>
             </div>
             
@@ -251,6 +263,18 @@ export default function Home() {
           {/* Theme toggle button stays at top right */}
           <div className="fixed top-4 right-4 z-[51]">
             <ThemeToggle />
+          </div>
+          
+          {/* Author attribution link in bottom-right */}
+          <div className="fixed bottom-4 right-4 z-[51]">
+            <a 
+              href="https://juanbenitez.dev" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            >
+              author
+            </a>
           </div>
           
           {/* Action buttons moved to top left */}

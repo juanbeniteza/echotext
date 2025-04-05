@@ -7,7 +7,7 @@ import { ThemeProvider } from "../hooks/useTheme";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "EchoText - Create and Share Text with Effects",
+  title: "~ echotext ~",
   description: "Create beautiful text with visual effects like shake, ripple, and jitter. Customize colors and formatting, then share with a unique link.",
 };
 

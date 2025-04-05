@@ -24,6 +24,16 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Button styling for better visibility */
+.dark-mode button.bg-white, [data-theme="dark"] button.bg-white {
+  color: #333333;
+}
+
+/* Foreground class for proper text coloring */
+.foreground {
+  color: var(--foreground) !important;
+}
+
 /* Dotted Background Pattern */
 .bg-dotted {
   background-color: var(--background);

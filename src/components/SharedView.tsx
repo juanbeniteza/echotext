@@ -64,6 +64,19 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
         <div className="absolute top-4 right-4 z-[30]">
           <ThemeToggle />
         </div>
+        
+        {/* Author attribution link in bottom-right */}
+        <div className="absolute bottom-4 right-4 z-[30]">
+          <a 
+            href="https://juanbenitez.dev" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+          >
+            author
+          </a>
+        </div>
+        
         <div className="p-6 rounded-xl">
           <p className="text-xl font-medium text-gray-800 dark:text-white">Loading shared content...</p>
         </div>
@@ -78,6 +91,19 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
         <div className="absolute top-4 right-4 z-[30]">
           <ThemeToggle />
         </div>
+        
+        {/* Author attribution link in bottom-right */}
+        <div className="absolute bottom-4 right-4 z-[30]">
+          <a 
+            href="https://juanbenitez.dev" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+          >
+            author
+          </a>
+        </div>
+        
         <div className="max-w-md text-center p-8 rounded-xl">
           <h2 className="text-3xl font-bold mb-4 foreground">Invalid Link</h2>
           <p className="mb-8 foreground text-lg">{error || "The URL you're trying to access is not valid."}</p>
@@ -101,6 +127,18 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
       {/* Theme Toggle in the top-right corner */}
       <div className="absolute top-4 right-4 z-[30]">
         <ThemeToggle />
+      </div>
+      
+      {/* Author attribution link in bottom-right */}
+      <div className="absolute bottom-4 right-4 z-[30]">
+        <a 
+          href="https://juanbenitez.dev" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+        >
+          author
+        </a>
       </div>
       
       {/* Action buttons container */}
