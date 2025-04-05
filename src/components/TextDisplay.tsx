@@ -31,6 +31,12 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const [isMobile, setIsMobile] = useState(false);
+  const [randomSeed, setRandomSeed] = useState(Date.now()); // Add random seed state
+
+  // Update random seed when text changes to create new starting positions
+  useEffect(() => {
+    setRandomSeed(Date.now());
+  }, [text]);
 
   // Update container size and detect mobile screens
   useEffect(() => {
@@ -129,21 +135,25 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
     // Create custom path patterns based on element index
     let animationPath;
     
-    // Distribute starting positions across the screen based on index
-    const getStartPosition = (idx: number) => {
-      // Create a grid of initial positions throughout the screen
-      const row = Math.floor(idx / 5); // 0-3 for rows
-      const col = idx % 5; // 0-4 for columns
+    // Generate random starting positions for each instance
+    const getStartPosition = () => {
+      // Use index and randomSeed to generate a pseudo-random number
+      // This ensures each instance gets a different position
+      // but positions remain stable during animations
+      const rng = () => {
+        // Simple seeded random using the randomSeed and instance index
+        return ((Math.sin(randomSeed + index * 100) + 1) / 2);
+      };
       
-      // Calculate percentages for initial positions
-      const startLeft = 15 + (col * 17.5); // 15%, 32.5%, 50%, 67.5%, 85%
-      const startTop = 15 + (row * 23.3); // 15%, 38.3%, 61.6%, 84.9%
+      // Create random positions between 15% and 85% for both axes
+      const startLeft = 15 + rng() * 70; // Random between 15% and 85%
+      const startTop = 15 + ((rng() * 7919) % 1) * 70; // Different random pattern for vertical
       
       return { startLeft, startTop };
     };
     
     // Get starting position for this instance
-    const { startLeft, startTop } = getStartPosition(index);
+    const { startLeft, startTop } = getStartPosition();
     
     // Calculate scaling values (based on index to create variety)
     // Base scale for each size category
