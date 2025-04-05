@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { TextConfig, Effect } from '../types';
 
 // Default configuration values
@@ -19,13 +19,17 @@ export const DEFAULT_CONFIG: TextConfig = {
 export const useTextConfig = (initialConfig: Partial<TextConfig> = {}) => {
   // Initialize with empty values for server-side rendering to avoid hydration issues
   const [config, setConfig] = useState<TextConfig>(DEFAULT_CONFIG);
+  const isInitialized = useRef(false);
   
   // Initialize the full config on the client side only
   useEffect(() => {
-    setConfig({
-      ...DEFAULT_CONFIG,
-      ...initialConfig,
-    });
+    if (!isInitialized.current) {
+      setConfig({
+        ...DEFAULT_CONFIG,
+        ...initialConfig,
+      });
+      isInitialized.current = true;
+    }
   }, [initialConfig]);
 
   // Update the entire configuration
@@ -81,16 +85,25 @@ export const useTextConfig = (initialConfig: Partial<TextConfig> = {}) => {
 
   // --- Text Formatting Setters ---
   const toggleBold = useCallback(() => {
-    updateConfig('isBold', !config.isBold);
-  }, [config.isBold, updateConfig]);
+    setConfig(prev => ({
+      ...prev,
+      isBold: !prev.isBold
+    }));
+  }, []);
 
   const toggleItalic = useCallback(() => {
-    updateConfig('isItalic', !config.isItalic);
-  }, [config.isItalic, updateConfig]);
+    setConfig(prev => ({
+      ...prev,
+      isItalic: !prev.isItalic
+    }));
+  }, []);
 
   const toggleStrikethrough = useCallback(() => {
-    updateConfig('isStrikethrough', !config.isStrikethrough);
-  }, [config.isStrikethrough, updateConfig]);
+    setConfig(prev => ({
+      ...prev,
+      isStrikethrough: !prev.isStrikethrough
+    }));
+  }, []);
   // --- End Text Formatting Setters ---
 
   return {
