@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { decodeConfig, ShareConfig } from '../lib/sharing';
+import { decodeConfigCompact } from '../lib/optimizedSharing';
 import TextDisplay from './TextDisplay'; 
 import ThemeToggle from './ThemeToggle';
 import Link from 'next/link';
@@ -31,7 +32,29 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
         // Wrap in a setTimeout to ensure any exceptions don't crash the entire app
         setTimeout(() => {
           try {
-            const decoded = decodeConfig(encodedConfig);
+            // First try the compact decoder (for new links)
+            let decoded = decodeConfigCompact(encodedConfig);
+            
+            // If that fails, try the legacy decoder (for old links)
+            if (!decoded) {
+              decoded = decodeConfig(encodedConfig);
+            }
+            
+            // Both decoders failed
+            if (!decoded) {
+              setError('This link cannot be decoded. It may be malformed or corrupted.');
+              setConfig(null);
+              
+              // Track failed link views
+              track('link_error', {
+                error_type: 'decode_failure',
+                encoded_id: encodedConfig
+              });
+              
+              setIsLoading(false);
+              return;
+            }
+            
             if (decoded && decoded.text && decoded.text.trim() !== '') {
               setConfig(decoded);
               setError(null);

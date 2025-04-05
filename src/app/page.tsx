@@ -6,6 +6,7 @@ import TextDisplay from '../components/TextDisplay';
 import ThemeToggle from '../components/ThemeToggle';
 import { Effect } from '../types';
 import { encodeConfig, ShareConfig } from '../lib/sharing';
+import { encodeConfigCompact } from '../lib/optimizedSharing';
 import { availableEffects, getEffectName, getEffectClass } from '../utils/effects';
 import { FiEye, FiX, FiShare2, FiCheck, FiCopy } from "react-icons/fi";
 import { copyToClipboard } from '../utils/clipboard';
@@ -88,7 +89,8 @@ export default function Home() {
         repeat: config.repeat,
     };
 
-    const encoded = encodeConfig(shareableConfig);
+    // Use optimized encoding for shorter URLs
+    const encoded = encodeConfigCompact(shareableConfig);
     if (!encoded) {
       alert("Failed to generate share link.");
       return;
