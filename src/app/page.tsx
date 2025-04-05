@@ -129,17 +129,17 @@ export default function Home() {
   };
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center p-8 bg-dotted">
+    <main className="relative flex min-h-screen flex-col items-center justify-start p-8 bg-dotted">
       
       {/* Theme Toggle in the top-right corner */}
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
       </div>
       
-      {/* Title and description - centered on desktop, single line each on mobile */}
-      <div className="absolute top-16 md:top-20 left-1/2 transform -translate-x-1/2 text-center z-10 w-full px-4">
-        <h1 className="text-4xl md:text-5xl font-bold whitespace-nowrap overflow-hidden text-ellipsis">~ echotext ~</h1>
-        <p className="text-md md:text-lg mt-2 whitespace-nowrap overflow-hidden text-ellipsis">share text with mesmerizing effects</p>
+      {/* Title and description - moved from absolute to relative positioning */}
+      <div className="text-center w-full px-4 pt-12 md:pt-16 mb-8 md:mb-12">
+        <h1 className="text-4xl md:text-5xl font-bold">~ echotext ~</h1>
+        <p className="text-md md:text-lg mt-2">share text with mesmerizing effects</p>
       </div>
 
       {/* Author attribution link - fixed to bottom for all displays */}
@@ -154,7 +154,7 @@ export default function Home() {
         </a>
       </div>
       
-      <div className="w-full max-w-3xl flex flex-col items-center space-y-6 md:space-y-8 mt-24 md:mt-40">
+      <div className="w-full max-w-3xl flex flex-col items-center space-y-6 md:space-y-8 mt-16 md:mt-24">
         
         <input
           type="text"
@@ -282,8 +282,16 @@ export default function Home() {
 
       {/* Fullscreen Preview */}
       {isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-dotted flex items-center justify-center p-4 overflow-auto">
-          <TextDisplay config={config} fullscreen={true} />
+        <div className="fixed inset-0 z-50 bg-dotted flex flex-col items-center justify-start p-4 overflow-auto">
+          {/* Add title at the top */}
+          <div className="text-center w-full px-4 pt-12 mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold">~ echotext ~</h1>
+          </div>
+          
+          {/* Text display centered vertically in the remaining space */}
+          <div className="flex-grow flex items-center justify-center w-full mt-16 md:mt-24">
+            <TextDisplay config={config} fullscreen={true} />
+          </div>
           
           {/* Theme toggle button stays at top right */}
           <div className="fixed top-4 right-4 z-[51]">
