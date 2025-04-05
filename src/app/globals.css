@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  /* Remove the circular reference */
+  /* --font-custom is defined via Next.js in layout.tsx */
+  
+  /* Convert @theme inline to standard CSS variables */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-custom), Arial, sans-serif;
+  --font-mono: monospace;
+}
+
+
+[data-theme="dark"], 
+.dark-mode {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-custom), Arial, Helvetica, sans-serif;
+}
+
+/* Button styling for better visibility */
+.dark-mode button.bg-white, [data-theme="dark"] button.bg-white {
+  color: #333333;
+}
+
+/* Foreground class for proper text coloring */
+.foreground {
+  color: var(--foreground) !important;
+}
+
+/* Dotted Background Pattern */
+.bg-dotted {
+  background-color: var(--background);
+  background-image: radial-gradient(circle, #e5e7eb 1px, transparent 1px);
+  background-size: 10px 10px; /* Adjust size of dots and spacing */
+}
+
+[data-theme="dark"] .bg-dotted,
+.dark-mode .bg-dotted {
+  background-image: radial-gradient(circle, #333333 1px, transparent 1px);
+}
