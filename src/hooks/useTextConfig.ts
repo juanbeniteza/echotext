@@ -6,7 +6,7 @@ export const DEFAULT_CONFIG: TextConfig = {
   text: '', // Start with empty text
   effect: Effect.NONE,
   color: '#000000',
-  fontSize: 24,
+  fontSize: 30, // Adjusted from 24 to better fit our min/max scale range
   fontFamily: 'Arial, sans-serif',
   spacing: 0,
   repeat: 50, // Increased default number of repetitions

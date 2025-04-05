@@ -92,8 +92,14 @@ export default function Home() {
           placeholder="Type your text here"
           value={config.text}
           onChange={(e) => setText(e.target.value)}
+          maxLength={20}
           aria-label="Text input"
         />
+
+        {/* Character limit indicator */}
+        <div className="text-xs text-gray-500 -mt-6 self-end mr-2">
+          {config.text.length}/20 characters
+        </div>
 
         {/* Responsive Controls Container */}
         <div className="flex flex-col items-center gap-4 md:flex-row md:flex-wrap md:justify-center md:gap-4">

@@ -90,6 +90,7 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
     const largeIndices = [0, 3, 11, 18]; // Center, top-right, middle, bottom
     const mediumIndices = [1, 7, 13, 16]; // Evenly distributed secondary focus
     
+    // Calculate size multiplier based on the index category
     let sizeMultiplier;
     if (largeIndices.includes(index)) {
       // Large focal points (120-150% of original size)
@@ -102,9 +103,15 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
       sizeMultiplier = 0.5 + (index % 8) * 0.05;
     }
     
+    // Apply size multiplier but ensure we stay within our min/max bounds
+    const rawFontSize = parseInt(baseTextStyle.fontSize as string) * sizeMultiplier;
+    // Use a lower maximum (30px) on mobile devices
+    const maxFontSize = isMobile ? 35 : 50;
+    const clampedFontSize = Math.min(Math.max(rawFontSize, 14), maxFontSize);
+    
     const adjustedTextStyle = {
       ...baseTextStyle,
-      fontSize: `${parseInt(baseTextStyle.fontSize as string) * sizeMultiplier}px`
+      fontSize: `${clampedFontSize}px`
     };
     
     // Animation timing values
@@ -149,9 +156,18 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
       baseScale = 0.7;
     }
     
+    // Calculate scale bounds to ensure font size stays between 14px and maxFontSize during animation
+    const baseFontSize = parseInt(baseTextStyle.fontSize as string);
+    
+    // How much can we scale down before hitting the minimum font size?
+    const minScaleFactor = Math.max(14 / (baseFontSize * baseScale), 0.5);
+    
+    // How much can we scale up before hitting the maximum font size?
+    const maxScaleFactor = Math.min(maxFontSize / (baseFontSize * baseScale), 1.8);
+    
     // Create scale animations that sync with movement paths
-    const scaleMin = baseScale * 0.7; // Minimum scale is 70% of the base
-    const scaleMax = baseScale * 1.5; // Maximum scale is 150% of the base
+    const scaleMin = baseScale * Math.max(0.7, minScaleFactor);
+    const scaleMax = baseScale * Math.min(1.5, maxScaleFactor);
     
     // Switch between different motion patterns for variety
     switch (index % 5) {
@@ -207,8 +223,12 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
         }}
       >
         <div
-          className={`effect-text ${effectClass} ${formattingClasses} max-w-[50vw] md:max-w-[30vw] whitespace-nowrap overflow-hidden text-ellipsis text-center`}
-          style={adjustedTextStyle}
+          className={`effect-text ${effectClass} ${formattingClasses} max-w-[50vw] md:max-w-[40vw] text-center break-words hyphens-auto`}
+          style={{
+            ...adjustedTextStyle,
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word'
+          }}
         >
           {text}
         </div>
