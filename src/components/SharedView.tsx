@@ -16,7 +16,8 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Function to safely decode config
+    setIsLoading(true);
+
     const safelyDecodeConfig = () => {
       if (!encodedConfig) {
         setError('Invalid URL. The share link parameter is missing.');
@@ -39,7 +40,20 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
             }
           } catch (err) {
             console.error("Failed to decode content:", err);
-            setError('Invalid URL. This EchoText link cannot be decoded properly.');
+            
+            // More specific error messages based on error type
+            if (err instanceof Error) {
+              if (err.message.includes('atob') || err.message.includes('decode')) {
+                setError('This link contains invalid characters that cannot be decoded properly.');
+              } else if (err.message.includes('JSON')) {
+                setError('This link contains data that cannot be properly processed.');
+              } else {
+                setError(`Invalid URL: ${err.message}`);
+              }
+            } else {
+              setError('Invalid URL. This EchoText link cannot be decoded properly.');
+            }
+            
             setConfig(null);
           } finally {
             setIsLoading(false);
@@ -48,7 +62,13 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
       } catch (err) {
         // Fallback error handler for any unexpected errors
         console.error("Unexpected error in decoding process:", err);
-        setError('An unexpected error occurred while processing this link.');
+        
+        // More informative error message
+        const errorMessage = err instanceof Error 
+          ? `An error occurred: ${err.message}` 
+          : 'An unexpected error occurred while processing this link.';
+          
+        setError(errorMessage);
         setConfig(null);
         setIsLoading(false);
       }
@@ -61,12 +81,12 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-dotted">
         {/* Theme Toggle in the top-right corner */}
-        <div className="absolute top-4 right-4 z-[30]">
+        <div className="fixed top-4 right-4 z-[30]">
           <ThemeToggle />
         </div>
         
         {/* Author attribution link in bottom-right */}
-        <div className="absolute bottom-4 right-4 z-[30]">
+        <div className="fixed bottom-4 right-4 z-[30]">
           <a 
             href="https://juanbenitez.dev" 
             target="_blank" 
@@ -88,12 +108,12 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-dotted p-8 dark:text-white">
         {/* Theme Toggle in the top-right corner */}
-        <div className="absolute top-4 right-4 z-[30]">
+        <div className="fixed top-4 right-4 z-[30]">
           <ThemeToggle />
         </div>
         
         {/* Author attribution link in bottom-right */}
-        <div className="absolute bottom-4 right-4 z-[30]">
+        <div className="fixed bottom-4 right-4 z-[30]">
           <a 
             href="https://juanbenitez.dev" 
             target="_blank" 
@@ -125,12 +145,12 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
       </div>
       
       {/* Theme Toggle in the top-right corner */}
-      <div className="absolute top-4 right-4 z-[30]">
+      <div className="fixed top-4 right-4 z-[30]">
         <ThemeToggle />
       </div>
       
       {/* Author attribution link in bottom-right */}
-      <div className="absolute bottom-4 right-4 z-[30]">
+      <div className="fixed bottom-4 right-4 z-[30]">
         <a 
           href="https://juanbenitez.dev" 
           target="_blank" 
@@ -142,7 +162,7 @@ export default function SharedView({ encodedConfig }: SharedViewProps) {
       </div>
       
       {/* Action buttons container */}
-      <div className="absolute top-4 left-4 z-[30]">
+      <div className="fixed top-4 left-4 z-[30]">
         {/* Create your own button */}
         <Link 
           href="/" 

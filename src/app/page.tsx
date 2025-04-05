@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTextConfig } from '../hooks/useTextConfig';
 import TextDisplay from '../components/TextDisplay';
 import ThemeToggle from '../components/ThemeToggle';
@@ -48,6 +48,11 @@ export default function Home() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleEffectClick = (effect: Effect) => {
     setEffect(effect);
@@ -58,6 +63,9 @@ export default function Home() {
   };
 
   const toggleFullscreen = () => {
+    // Don't enter fullscreen if there's no text
+    if (!config.text.trim() && !isFullscreen) return;
+    
     setIsFullscreen(!isFullscreen);
     if (isCopied) setIsCopied(false);
   };
@@ -85,7 +93,9 @@ export default function Home() {
       return;
     }
 
-    const generatedShareUrl = `${window.location.origin}/s/${encoded}`;
+    // Fix hydration by using proper Next.js approach
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const generatedShareUrl = `${origin}/s/${encoded}`;
     setShareUrl(generatedShareUrl);
 
     const success = await copyToClipboard(generatedShareUrl);
@@ -115,8 +125,14 @@ export default function Home() {
         <ThemeToggle />
       </div>
       
-      {/* Author attribution link in bottom-right */}
-      <div className="absolute bottom-4 right-4 z-10">
+      {/* Title and description - centered on desktop, single line each on mobile */}
+      <div className="absolute top-16 md:top-20 left-1/2 transform -translate-x-1/2 text-center z-10 w-full px-4">
+        <h1 className="text-4xl md:text-5xl font-bold whitespace-nowrap overflow-hidden text-ellipsis">~ echotext ~</h1>
+        <p className="text-md md:text-lg mt-2 whitespace-nowrap overflow-hidden text-ellipsis">create text with mesmerizing effects</p>
+      </div>
+
+      {/* Author attribution link - fixed to bottom for all displays */}
+      <div className="fixed bottom-4 right-4 z-10">
         <a 
           href="https://juanbenitez.dev" 
           target="_blank" 
@@ -127,26 +143,23 @@ export default function Home() {
         </a>
       </div>
       
-      <div className="absolute top-16 md:top-20 left-1/2 transform -translate-x-1/2 text-center z-10">
-        <h1 className="text-4xl md:text-5xl font-bold">~ echotext ~</h1>
-        <p className="text-md md:text-lg mt-2">create text with mesmerizing effects</p>
-      </div>
-
-      <div className="w-full max-w-3xl flex flex-col items-center space-y-8 mt-32 md:mt-40">
+      <div className="w-full max-w-3xl flex flex-col items-center space-y-6 md:space-y-8 mt-24 md:mt-40">
         
         <input
           type="text"
-          className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg text-center text-2xl text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm transition duration-150 ease-in-out bg-white dark:bg-gray-800"
+          className="w-full p-3 md:p-4 border border-gray-300 dark:border-gray-700 rounded-lg text-center text-xl md:text-2xl text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm transition duration-150 ease-in-out bg-white dark:bg-gray-800"
           placeholder="Type your text here"
-          value={config.text}
+          value={isClient ? config.text : ''}
           onChange={(e) => setText(e.target.value)}
           maxLength={20}
           aria-label="Text input"
+          suppressHydrationWarning
+          autoComplete="off"
         />
 
         {/* Character limit indicator */}
         <div className="text-xs -mt-6 self-end mr-2">
-          {config.text.length}/20 characters
+          {isClient ? config.text.length : 0}/20 characters
         </div>
 
         {/* Responsive Controls Container */}
@@ -212,8 +225,9 @@ export default function Home() {
         {/* Action Buttons */}
         <div className="flex items-center space-x-4 pt-4">
           <button 
-            className="flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out shadow-sm bg-white dark:bg-gray-800"
+            className={`flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out shadow-sm bg-white dark:bg-gray-800 ${!config.text.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={toggleFullscreen}
+            disabled={!config.text.trim()}
             aria-label={isFullscreen ? "Exit fullscreen preview" : "Enter fullscreen preview"}
           >
             {isFullscreen ? <FiX className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}

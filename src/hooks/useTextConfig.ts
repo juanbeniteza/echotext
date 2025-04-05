@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { TextConfig, Effect } from '../types';
 
 // Default configuration values
@@ -17,10 +17,16 @@ export const DEFAULT_CONFIG: TextConfig = {
 };
 
 export const useTextConfig = (initialConfig: Partial<TextConfig> = {}) => {
-  const [config, setConfig] = useState<TextConfig>({
-    ...DEFAULT_CONFIG,
-    ...initialConfig,
-  });
+  // Initialize with empty values for server-side rendering to avoid hydration issues
+  const [config, setConfig] = useState<TextConfig>(DEFAULT_CONFIG);
+  
+  // Initialize the full config on the client side only
+  useEffect(() => {
+    setConfig({
+      ...DEFAULT_CONFIG,
+      ...initialConfig,
+    });
+  }, []);
 
   // Update the entire configuration
   const setFullConfig = useCallback((newConfig: TextConfig) => {

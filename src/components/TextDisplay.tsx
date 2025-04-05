@@ -31,20 +31,25 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const [isMobile, setIsMobile] = useState(false);
-  const [randomSeed, setRandomSeed] = useState(Date.now()); // Add random seed state
+  const [randomSeed, setRandomSeed] = useState(0);
 
   // Update random seed when text changes to create new starting positions
   useEffect(() => {
+    // Only set the random seed on the client side to prevent hydration mismatch
     setRandomSeed(Date.now());
   }, [text]);
 
   // Update container size and detect mobile screens
   useEffect(() => {
+    // Exit early on server side to avoid hydration mismatch
+    if (typeof window === 'undefined') return;
+    
     // Initial check for mobile screen
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768); // Standard mobile breakpoint
     };
     
+    // Only run this code on the client side
     checkMobile(); // Check on mount
     
     if (containerRef.current) {
@@ -256,13 +261,16 @@ const TextDisplay: React.FC<TextDisplayProps> = ({
   const conditionalClasses = fullscreen 
     ? "w-full h-full" // Fill parent
     : "min-h-[300px] border border-gray-200 rounded-md bg-white"; // Non-fullscreen view
+    
+  // Check if we're on the client side to avoid hydration mismatches
+  const isClient = typeof window !== 'undefined';
 
   return (
     <div 
       ref={containerRef} 
       className={`${baseClasses} ${conditionalClasses}`}
     >
-      {text && containerSize.width > 0 ? (
+      {isClient && text && containerSize.width > 0 ? (
         <>{textElements}</>
       ) : (
         <div className="absolute inset-0 flex items-center justify-center text-gray-400 italic">

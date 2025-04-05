@@ -1,6 +1,144 @@
 import pako from 'pako';
 import { Effect } from '../types'; // Import Effect type
 
+/**
+ * Cross-platform base64 decoder that works in browser and Node.js environments
+ * @param base64 The base64 string to decode
+ * @returns Decoded string
+ */
+function safeBase64Decode(base64: string): string {
+  // Make base64 standard: replace URL-safe chars with standard base64 chars
+  const standardBase64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+  
+  // Add padding if needed
+  const paddedBase64 = standardBase64.padEnd(
+    standardBase64.length + (4 - (standardBase64.length % 4 || 4)) % 4,
+    '='
+  );
+
+  try {
+    // Browser environment
+    return atob(paddedBase64);
+  } catch (e) {
+    // Node.js environment
+    if (typeof Buffer !== 'undefined') {
+      const buffer = Buffer.from(paddedBase64, 'base64');
+      return Array.from(new Uint8Array(buffer))
+        .map(byte => String.fromCharCode(byte))
+        .join('');
+    }
+    
+    // If all fails, try a manual decoder as last resort
+    return manualBase64Decode(paddedBase64);
+  }
+}
+
+/**
+ * Manual base64 decoder as a last resort
+ * This is a fallback implementation for environments where neither atob nor Buffer are available
+ */
+function manualBase64Decode(base64: string): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const lookup = new Uint8Array(256);
+  
+  for (let i = 0; i < chars.length; i++) {
+    lookup[chars.charCodeAt(i)] = i;
+  }
+  
+  // Set padding character value
+  lookup['='.charCodeAt(0)] = 0;
+
+  const bytes = [];
+  let p = 0;
+  let encoded1, encoded2, encoded3, encoded4;
+
+  for (let i = 0; i < base64.length; i += 4) {
+    // Get values of base64 characters
+    encoded1 = lookup[base64.charCodeAt(i)] || 0;
+    encoded2 = lookup[base64.charCodeAt(i + 1)] || 0;
+    encoded3 = lookup[base64.charCodeAt(i + 2)] || 0;
+    encoded4 = lookup[base64.charCodeAt(i + 3)] || 0;
+
+    // Add the first byte
+    bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
+    
+    // Check for padding in the 3rd position
+    if (base64.charAt(i + 2) !== '=') {
+      bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
+    }
+    
+    // Check for padding in the 4th position
+    if (base64.charAt(i + 3) !== '=') {
+      bytes[p++] = ((encoded3 & 3) << 6) | encoded4;
+    }
+  }
+
+  // Convert byte array to string
+  let result = '';
+  for (let i = 0; i < p; i++) {
+    result += String.fromCharCode(bytes[i]);
+  }
+  
+  return result;
+}
+
+/**
+ * Cross-platform base64 encoder that works in browser and Node.js environments
+ * @param binaryStr The binary string to encode
+ * @returns Base64 encoded string
+ */
+function safeBase64Encode(binaryStr: string): string {
+  try {
+    // Browser environment
+    return btoa(binaryStr);
+  } catch (e) {
+    // Node.js environment
+    if (typeof Buffer !== 'undefined') {
+      const buffer = Buffer.from(binaryStr, 'binary');
+      return buffer.toString('base64');
+    }
+    
+    // If all fails, try a manual encoder as last resort
+    return manualBase64Encode(binaryStr);
+  }
+}
+
+/**
+ * Manual base64 encoder as a last resort
+ * This is a fallback implementation for environments where neither btoa nor Buffer are available
+ */
+function manualBase64Encode(data: string): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  let result = '';
+  let i = 0;
+  let byteNum = 0;
+  let chunk = 0;
+  
+  while (i < data.length) {
+    const code = data.charCodeAt(i++);
+    chunk = (chunk << 8) | code;
+    byteNum++;
+    
+    if (byteNum === 3 || i === data.length) {
+      result += chars[(chunk & 0xfc0000) >> 18];
+      result += chars[(chunk & 0x03f000) >> 12];
+      
+      if (byteNum > 1 || i === data.length) {
+        result += byteNum > 1 ? chars[(chunk & 0x000fc0) >> 6] : '=';
+      }
+      
+      if (byteNum > 2 || i === data.length) {
+        result += byteNum > 2 ? chars[chunk & 0x00003f] : '=';
+      }
+      
+      chunk = 0;
+      byteNum = 0;
+    }
+  }
+  
+  return result;
+}
+
 // Redefine based on useTextConfig state
 export interface ShareConfig {
   text: string;
@@ -26,20 +164,21 @@ export function encodeConfig(config: ShareConfig): string {
   try {
     const jsonString = JSON.stringify(config);
     const compressed = pako.deflate(jsonString);
-    // Convert Uint8Array to a binary string needed by btoa
+    
+    // Convert Uint8Array to a binary string
     let binaryString = '';
-    // Avoid potential issues with large arrays and apply calls
     for (let i = 0; i < compressed.length; i++) {
         binaryString += String.fromCharCode(compressed[i]);
     }
 
-    const base64 = btoa(binaryString);
+    // Use our safe cross-platform base64 encoder
+    const base64 = safeBase64Encode(binaryString);
+    
     // Make base64 URL-safe: replace '+' with '-', '/' with '_', remove '=' padding
     const urlSafeBase64 = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
     return urlSafeBase64;
   } catch (error) {
     console.error("Failed to encode config:", error);
-    // Return empty string or throw an error based on desired error handling
     return '';
   }
 }
@@ -55,16 +194,9 @@ export function decodeConfig(encodedString: string): ShareConfig | null {
   }
   
   try {
-    // Make base64 standard again: replace '-' with '+', '_' with '/'
-    let base64 = encodedString.replace(/-/g, '+').replace(/_/g, '/');
-    // Add padding back: base64 length must be a multiple of 4
-    while (base64.length % 4) {
-      base64 += '=';
-    }
-
     try {
-      // Decode base64 to binary string
-      const binaryString = atob(base64);
+      // Use our safe cross-platform base64 decoder
+      const binaryString = safeBase64Decode(encodedString);
       
       // Convert binary string to Uint8Array
       const bytes = new Uint8Array(binaryString.length);
@@ -86,7 +218,7 @@ export function decodeConfig(encodedString: string): ShareConfig | null {
         // Check if decompressed data is valid before parsing
         if (!decompressed || typeof decompressed !== 'string' || 
             decompressed === 'undefined' || decompressed.trim() === '') {
-          console.error("Invalid decompressed data:", decompressed);
+          // console.error("Invalid decompressed data:", decompressed);
           return null;
         }
 
