@@ -145,7 +145,7 @@ export default function Home() {
       {/* Author attribution link - fixed to bottom for all displays */}
       <div className="fixed bottom-4 right-4 z-10">
         <a 
-          href={process.env.NEXT_PUBLIC_AUTHOR_URL || "https://juanbenitez.dev"}
+          href={process.env.NEXT_PUBLIC_AUTHOR_URL}
           target="_blank" 
           rel="noopener" 
           className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
@@ -283,13 +283,8 @@ export default function Home() {
       {/* Fullscreen Preview */}
       {isFullscreen && (
         <div className="fixed inset-0 z-50 bg-dotted flex flex-col items-center justify-start p-4 overflow-auto">
-          {/* Add title at the top */}
-          <div className="text-center w-full px-4 pt-12 mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold">~ echotext ~</h1>
-          </div>
-          
           {/* Text display centered vertically in the remaining space */}
-          <div className="flex-grow flex items-center justify-center w-full mt-16 md:mt-24">
+          <div className="flex-grow flex items-center justify-center w-full">
             <TextDisplay config={config} fullscreen={true} />
           </div>
           
@@ -301,7 +296,7 @@ export default function Home() {
           {/* Author attribution link in bottom-right */}
           <div className="fixed bottom-4 right-4 z-[51]">
             <a 
-              href={process.env.NEXT_PUBLIC_AUTHOR_URL || "https://juanbenitez.dev"}
+              href={process.env.NEXT_PUBLIC_AUTHOR_URL}
               target="_blank" 
               rel="noopener" 
               className="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
